@@ -1,0 +1,23 @@
+personality = "pragmatic"
+[marketplaces.ponytail]
+last_updated = "2026-06-18T17:05:28Z"
+last_revision = "8d5037d9e50bcd4025b89db213e061cac57acbfa"
+source_type = "git"
+source = "https://github.com/DietrichGebert/ponytail.git"
+
+[plugins."ponytail@ponytail"]
+enabled = true
+
+[projects.'c:\users\chencliff\project\shenxu-wellness-dashboard']
+trust_level = "trusted"
+
+[hooks.state]
+
+[hooks.state."ponytail@ponytail:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:469244cc9dcbe0d03cee72cd0ca9427e782e79401e341d3e2404f31271395641"
+
+[hooks.state."ponytail@ponytail:hooks/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:8eff5fa1384d969f4c961e3e4a4075fdc68e6d802b7072f37f3f84977aa3d164"
+
+[windows]
+sandbox = "unelevated"
