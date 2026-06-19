@@ -64,10 +64,14 @@
 
 ## Sprint 4: Manual Workouts
 
-- [ ] Workout session CRUD.
-- [ ] Dynamic exercises and sets.
-- [ ] Strength, cardio, Pilates, running, tennis, and custom workout fields.
-- [ ] Volume, RPE, and pain tracking.
+- [x] Shared workout model for planned and completed sessions.
+- [x] Workout session CRUD.
+- [x] Dynamic exercises and generated sets.
+- [x] Strength, cardio, Pilates, running, tennis, and custom workout fields.
+- [x] Weight, set count, reps, duration, and intensity tracking.
+- [x] Session-level and exercise-level pain notes.
+- [ ] Apply `supabase/migrations/005_workout_sessions.sql`.
+- [ ] Per-set inline editing/check flow.
 
 ## Sprint 5: Workout Planning
 

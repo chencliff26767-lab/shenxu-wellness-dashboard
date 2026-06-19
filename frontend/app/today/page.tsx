@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Dumbbell, MessageCircle, Plus } from "lucide-react";
+import { Dumbbell, MessageCircle, Plus } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
 import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
@@ -38,21 +38,24 @@ export default async function TodayPage() {
           <div className="mt-5 grid grid-cols-2 gap-2">
             <Link
               className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-              href="/body"
+              href="/workouts"
             >
               記錄現在
             </Link>
-            <Button type="button" variant="secondary">
+            <Link
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border bg-card px-4 text-sm font-medium hover:bg-muted"
+              href="/workouts"
+            >
               安排訓練
-            </Button>
+            </Link>
           </div>
         </section>
 
         <section className="mt-4 grid grid-cols-2 gap-3">
           <QuickCard href="/body" icon={<Plus className="h-5 w-5" />} label="身材紀錄" value="體重 / 腰圍 / InBody" />
           <QuickCard href="/meals" icon={<Plus className="h-5 w-5" />} label="飲食紀錄" value="餐點 / 照片 / 備註" />
-          <QuickCard icon={<MessageCircle className="h-5 w-5" />} label="教練回饋" value="尚無新留言" />
-          <QuickCard icon={<CalendarDays className="h-5 w-5" />} label="登入帳號" value={userEmail} />
+          <QuickCard href="/workouts" icon={<Dumbbell className="h-5 w-5" />} label="訓練紀錄" value="記錄現在 / 安排訓練" />
+          <QuickCard icon={<MessageCircle className="h-5 w-5" />} label="登入帳號" value={userEmail} />
         </section>
       </div>
       <BottomNav />

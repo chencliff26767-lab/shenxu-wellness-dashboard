@@ -3,9 +3,9 @@ import { BookOpen, CalendarDays, HeartPulse, Plus, UserRound } from "lucide-reac
 
 const items = [
   { label: "今日", href: "/today", icon: HeartPulse },
-  { label: "計畫", href: "/today", icon: CalendarDays },
-  { label: "新增", href: "/meals", icon: Plus },
-  { label: "紀錄", href: "/body", icon: BookOpen },
+  { label: "訓練", href: "/workouts", icon: CalendarDays },
+  { label: "飲食", href: "/meals", icon: Plus },
+  { label: "身材", href: "/body", icon: BookOpen },
   { label: "教練", href: "/settings/access", icon: UserRound },
 ];
 
