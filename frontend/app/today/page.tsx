@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CalendarDays, Dumbbell, MessageCircle, Plus } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
 import { BottomNav } from "@/components/bottom-nav";
@@ -32,12 +33,15 @@ export default async function TodayPage() {
           </div>
           <div className="relative z-10 max-w-[78%]">
             <h2 className="text-2xl font-semibold">今天還沒有安排訓練</h2>
-            <p className="mt-3 leading-7 text-muted-foreground">
-              先替未來的自己準備好，到了現場就不用再想。
-            </p>
+            <p className="mt-3 leading-7 text-muted-foreground">先替未來的自己準備好，到了現場就不用再想。</p>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-2">
-            <Button type="button">記錄現在</Button>
+            <Link
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+              href="/body"
+            >
+              記錄現在
+            </Link>
             <Button type="button" variant="secondary">
               安排訓練
             </Button>
@@ -45,10 +49,10 @@ export default async function TodayPage() {
         </section>
 
         <section className="mt-4 grid grid-cols-2 gap-3">
-          <QuickCard icon={<Plus className="h-5 w-5" />} label="快速紀錄" value="身材 / 飲食 / 訓練" />
+          <QuickCard href="/body" icon={<Plus className="h-5 w-5" />} label="身材紀錄" value="體重 / 腰圍 / InBody" />
+          <QuickCard href="/meals" icon={<Plus className="h-5 w-5" />} label="飲食紀錄" value="餐點 / 照片 / 備註" />
           <QuickCard icon={<MessageCircle className="h-5 w-5" />} label="教練回饋" value="尚無新留言" />
-          <QuickCard icon={<CalendarDays className="h-5 w-5" />} label="訓練補記" value="強度 / 疼痛 / 備註" />
-          <QuickCard icon={<Dumbbell className="h-5 w-5" />} label="登入帳號" value={userEmail} />
+          <QuickCard icon={<CalendarDays className="h-5 w-5" />} label="登入帳號" value={userEmail} />
         </section>
       </div>
       <BottomNav />
@@ -66,15 +70,35 @@ async function getUserEmail() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return user?.email || "已驗證";
+  return user?.email || "尚未登入";
 }
 
-function QuickCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="min-h-28 rounded-lg border border-border bg-card p-4">
+function QuickCard({
+  href,
+  icon,
+  label,
+  value,
+}: {
+  href?: string;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  const content = (
+    <>
       <div className="text-primary">{icon}</div>
       <p className="mt-3 text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 text-sm font-medium">{value}</p>
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link className="min-h-28 rounded-lg border border-border bg-card p-4" href={href}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="min-h-28 rounded-lg border border-border bg-card p-4">{content}</div>;
 }

@@ -17,11 +17,12 @@
 
 ## Setup / Deployment
 
-- [ ] Create Supabase project.
-- [ ] Apply `supabase/migrations/001_foundation.sql`.
-- [ ] Configure Supabase Auth redirect URLs for localhost and production.
+- [x] Create Supabase project.
+- [x] Apply `supabase/migrations/001_foundation.sql`.
+- [x] Configure Supabase Auth redirect URLs for localhost.
+- [ ] Configure Supabase Auth redirect URLs for production.
 - [ ] Configure Google OAuth in Google Cloud and Supabase.
-- [ ] Fill `frontend/.env.local` for real local login.
+- [x] Fill `frontend/.env.local` for real local login.
 - [ ] Push repository to GitHub.
 - [ ] Create Vercel project from the GitHub repository.
 - [ ] Add Vercel environment variables.
@@ -30,19 +31,34 @@
 
 ## Sprint 2: Body Metrics
 
-- [ ] Body metric CRUD.
-- [ ] Weight, waist, BMI, and seven-day average.
-- [ ] InBody record form for occasional measurements.
-- [ ] InBody fields: measured_at, body_weight_kg, body_fat_percent, skeletal_muscle_mass_kg, body_fat_mass_kg, visceral_fat_level, inbody_score, basal_metabolic_rate_kcal, note.
-- [ ] Optional InBody photo attachment for reference only; manual values remain the source of truth.
+- [x] Body metric CRUD.
+- [x] Body metric create form.
+- [x] Body metric edit form.
+- [x] Body metric recent-record list.
+- [x] Body metric delete action.
+- [x] Weight, waist, and BMI.
+- [x] Seven-day average.
+- [ ] Apply `supabase/migrations/002_body_metrics.sql`.
+- [ ] Apply `supabase/migrations/003_body_metrics_inbody.sql`.
+- [x] InBody record form for occasional measurements.
+- [x] InBody values included in create and edit flow.
+- [x] Latest InBody values shown in body summary.
+- [x] InBody fields: body_fat_percent, skeletal_muscle_mass_kg, body_fat_mass_kg, waist_hip_ratio, visceral_fat_level, basal_metabolic_rate_kcal.
+- [x] Optional InBody JPG attachment for reference only; manual values remain the source of truth.
 - [ ] Mobile-safe trend charts.
 - [ ] Gentle empty/error states.
 
 ## Sprint 3: Meals
 
-- [ ] Meal CRUD with photo upload.
-- [ ] Client-side WebP compression.
-- [ ] Private storage and signed URLs.
+- [x] Meal CRUD with photo upload.
+- [x] Meal create form.
+- [x] Meal edit form.
+- [x] Meal recent-record list.
+- [x] Meal delete action.
+- [x] Client-side WebP compression.
+- [x] Compress meal photos to max 1280px wide and 500KB.
+- [x] Private storage path and signed URL display.
+- [ ] Apply `supabase/migrations/004_meal_entries.sql`.
 - [ ] Copy previous meal.
 - [ ] Delete orphaned display/thumbnail files.
 
@@ -82,7 +98,7 @@
 ## Sprint 8: Photo Storage Optimization
 
 - [ ] Adaptive WebP compression.
-- [ ] Display target 80-180KB, hard limit 250KB.
+- [ ] Display target 80-180KB, hard limit 500KB.
 - [ ] Thumbnail target 15-40KB.
 - [ ] HEIC/HEIF iPhone validation.
 - [ ] Storage usage estimate and orphan cleanup.

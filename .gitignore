@@ -19,3 +19,14 @@ frontend/.env.local
 __pycache__/
 *.py[cod]
 .run.*.log
+
+.codex/cache/
+.codex/logs_*.sqlite*
+.codex/goals_*.sqlite*
+.codex/state_*.sqlite*
+.codex/memories_*.sqlite*
+.codex/models_cache.json
+.codex/sessions/
+.codex/plugins/
+.codex/.tmp/
+.codex/vendor_imports/
