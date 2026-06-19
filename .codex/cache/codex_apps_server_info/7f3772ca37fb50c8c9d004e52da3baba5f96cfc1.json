@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "server_info": {
-    "name": "plugin-runtime",
+    "name": "codex-connectors-mcp",
     "title": null,
     "version": "0.1.0",
     "description": null,

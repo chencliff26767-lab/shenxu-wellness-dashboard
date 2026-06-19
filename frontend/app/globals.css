@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 42 33% 96%;
+  --foreground: 180 10% 18%;
+  --muted: 42 22% 90%;
+  --muted-foreground: 175 8% 40%;
+  --border: 38 19% 82%;
+  --primary: 166 24% 34%;
+  --primary-foreground: 42 40% 96%;
+  --card: 42 36% 98%;
+  --card-foreground: 180 10% 18%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: hsl(var(--background));
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}

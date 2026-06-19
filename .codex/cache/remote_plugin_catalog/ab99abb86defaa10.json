@@ -643,7 +643,7 @@
       "authentication_policy": "ON_INSTALL",
       "status": "AVAILABLE",
       "release": {
-        "version": "1.0.2-beta.1",
+        "version": "1.0.3-beta.1",
         "display_name": "Base44",
         "description": "Build and deploy Base44 full-stack apps with CLI project management and JavaScript/TypeScript SDK development skills",
         "bundle_download_url": null,
@@ -680,8 +680,8 @@
             "Build a feature in my existing Base44 app.",
             "Debug errors from my Base44 backend functions."
           ],
-          "composer_icon_url": "https://files.openai.com/content?id=file_000000003e20722f8c5a4efa8da39b09&cdn=1&cp=pi&ma=31363200&ts=0&p=pi&cid=1&sig=32bc4e735bc70ac27cfbe894dbc780aaed04804ebac13e2472cc2ec442484582&v=0",
-          "logo_url": "https://files.openai.com/content?id=file_000000002180722f94d0ef20897f0b4c&cdn=1&cp=pi&ma=31104000&ts=0&p=pi&cid=1&sig=3c257c17b12adeadfa03e3ea15b54df9223edf9419b3884a4ef045f8aa789a12&v=0",
+          "composer_icon_url": "https://files.openai.com/content?id=file_00000000ee08720c8980657ba8e9fb74&cdn=1&cp=pi&ma=30326400&ts=0&p=pi&cid=1&sig=5201352605b172a70114bb65e0833550636a1fc75b77401713d91939c19b990d&v=0",
+          "logo_url": "https://files.openai.com/content?id=file_00000000f600722f8261acf0a2acce75&cdn=1&cp=pi&ma=32572800&ts=0&p=pi&cid=1&sig=1914ed492ab8c737ce14af1a3d6d6e58fe01f530a663b6e6640b1a1e07f08a1c&v=0",
           "screenshot_urls": []
         },
         "skills": [
@@ -5108,7 +5108,7 @@
       "authentication_policy": "ON_INSTALL",
       "status": "AVAILABLE",
       "release": {
-        "version": "2.0.9",
+        "version": "2.0.10",
         "display_name": "Figma",
         "description": "Figma workflows for design implementation, Code Connect templates, and design system rule generation.",
         "bundle_download_url": null,
@@ -5145,8 +5145,8 @@
             "Create Code Connect templates for my components",
             "Build or update a screen in Figma"
           ],
-          "composer_icon_url": "https://files.openai.com/content?id=file_000000005ddc722fa5e61faba877ac89&cdn=1&cp=pi&ma=31536000&ts=0&p=pi&cid=1&sig=183e5462762c35dc78c1ac3c0a9842c6c540f1e40293d6d1dc8067f58c81f702&v=0",
-          "logo_url": "https://files.openai.com/content?id=file_00000000c27c722fae219bdb573547ad&cdn=1&cp=pi&ma=32140800&ts=0&p=pi&cid=1&sig=e5d8964a448751a70111ba53b6ed8984c75fd4c25530a57ee6bef31eb32673ec&v=0",
+          "composer_icon_url": "https://files.openai.com/content?id=file_0000000010c471f5a1e0f7c88b695684&cdn=1&cp=pi&ma=32313600&ts=0&p=pi&cid=1&sig=2023d95812642e3f808a66186b03f70f5ba4b58c4988772340f60ef181981c85&v=0",
+          "logo_url": "https://files.openai.com/content?id=file_00000000541071f5bc19528609242875&cdn=1&cp=pi&ma=32745600&ts=0&p=pi&cid=1&sig=5140d0edc8e03b69ebc8dc9028bc167e6b998ec67d03b44d20a0b3cab5434088&v=0",
           "screenshot_urls": []
         },
         "skills": [
@@ -5622,7 +5622,7 @@
       "authentication_policy": "ON_INSTALL",
       "status": "AVAILABLE",
       "release": {
-        "version": "0.1.3",
+        "version": "0.1.5",
         "display_name": "GitHub",
         "description": "Inspect repositories, triage pull requests and issues, debug CI, and publish changes through a hybrid GitHub connector and CLI workflow.",
         "bundle_download_url": null,
@@ -5656,8 +5656,8 @@
           "default_prompts": [
             "Inspect PRs, triage issues, debug failing checks, and prepare code changes for review"
           ],
-          "composer_icon_url": "https://files.openai.com/content?id=file_00000000559c71f781eb428206b2afcf&cdn=1&cp=pi&ma=30931200&ts=0&p=pi&cid=1&sig=f31d58f8610d3ade859760b7915065100c0876ec8c88f853d1c8ee6259d6fdda&v=0",
-          "logo_url": "https://files.openai.com/content?id=file_000000003570722fadc967d05090ccfc&cdn=1&cp=pi&ma=31449600&ts=0&p=pi&cid=1&sig=a66a0d1e1d24a5d1d0e2f32f4bea39ea68476f20650420d5ad0d2f16202539e6&v=0",
+          "composer_icon_url": "https://files.openai.com/content?id=file_00000000f4dc722fb54ac01daf017626&cdn=1&cp=pi&ma=30412800&ts=0&p=pi&cid=1&sig=e7e71414227d53bc25cc0a5718bb1aa9d4a56ea33f4e7315265417bcfab56728&v=0",
+          "logo_url": "https://files.openai.com/content?id=file_00000000d960720ca616a29dbc1cc99e&cdn=1&cp=pi&ma=32054400&ts=0&p=pi&cid=1&sig=13c3bc72bb3e52791cd1c8206429a4ca8c517dffe6b8ae52b4ef0703c39c3f2a&v=0",
           "screenshot_urls": []
         },
         "skills": [
@@ -5669,8 +5669,8 @@
               "short_description": "Address actionable PR feedback",
               "brand_color": null,
               "default_prompt": "Use $gh-address-comments to review unresolved pull request feedback, implement the selected fixes, and summarize what changed.",
-              "icon_small_url": "https://files.openai.com/content?id=file_00000000f494720caad00d0a312daa8f&cdn=1&cp=pi&ma=30326400&ts=0&p=pi&cid=1&sig=e69d79b7c9edacf95bee5827da319aaea9f8e12cc645adfdb38dc9402942e55c&v=0",
-              "icon_large_url": "https://files.openai.com/content?id=file_00000000f610720c98c347a0f08bda07&cdn=1&cp=pi&ma=30931200&ts=0&p=pi&cid=1&sig=3b82339810e0452dc4b7fa60af2177bd64c2b33909f95e6bc1aad4e240ed8943&v=0"
+              "icon_small_url": "https://files.openai.com/content?id=file_00000000a24c722f96e0fbb6b5ac67bd&cdn=1&cp=pi&ma=30844800&ts=0&p=pi&cid=1&sig=e24e59506a4934489cd0ba95e908f0b213496491c519cbb55e3206ced7583370&v=0",
+              "icon_large_url": "https://files.openai.com/content?id=file_000000009ff0722f863f2b0e25601502&cdn=1&cp=pi&ma=32140800&ts=0&p=pi&cid=1&sig=2b67407781d742e3e8c31bfcc0b98ae27fb425c98e36a8bf34b9af17a8b10978&v=0"
             }
           },
           {
@@ -5681,8 +5681,8 @@
               "short_description": "Debug failing GitHub Actions checks",
               "brand_color": null,
               "default_prompt": "Use $gh-fix-ci to inspect the failing GitHub Actions checks on this PR, summarize the root cause, and propose the smallest viable fix.",
-              "icon_small_url": "https://files.openai.com/content?id=file_00000000bfbc720ca3d02fbe3b47b057&cdn=1&cp=pi&ma=30844800&ts=0&p=pi&cid=1&sig=38c45a6b088f0566cd89098b782622b7fecac4509439274a16bd881fc61e130a&v=0",
-              "icon_large_url": "https://files.openai.com/content?id=file_00000000bc84720c8839458a0cc0f459&cdn=1&cp=pi&ma=30844800&ts=0&p=pi&cid=1&sig=8b807e3970e41b55dcc99c00e5bc24b31a05fb9a550573a52e57f4bfad8e8c85&v=0"
+              "icon_small_url": "https://files.openai.com/content?id=file_00000000b848720c8808bdf0f4464886&cdn=1&cp=pi&ma=30844800&ts=0&p=pi&cid=1&sig=d138f1b6fdd68c97ded23b31b87c60627062c2ea21b22b1dd96919b0051856da&v=0",
+              "icon_large_url": "https://files.openai.com/content?id=file_000000007d20720c995dea94521c2d56&cdn=1&cp=pi&ma=31104000&ts=0&p=pi&cid=1&sig=2599879cb5b90564ba90aeb9293070fe5655b978aa1853e99b8dc5733de129cc&v=0"
             }
           },
           {
@@ -5693,8 +5693,8 @@
               "short_description": "Inspect PRs, issues, CI, and publish flows",
               "brand_color": null,
               "default_prompt": "Use $github to inspect pull requests and issues, orient the repository context, and choose the right GitHub workflow.",
-              "icon_small_url": "https://files.openai.com/content?id=file_000000007004720caac41ad0a553dc13&cdn=1&cp=pi&ma=30240000&ts=0&p=pi&cid=1&sig=c46a906e2ae73459c675ae4feb625569f4fb4a4e60bacb130399b19e0d50cf11&v=0",
-              "icon_large_url": "https://files.openai.com/content?id=file_000000006c9c720cafb5c1edc46284a8&cdn=1&cp=pi&ma=30240000&ts=0&p=pi&cid=1&sig=d5ffe69b7793a63c4b2f6d4d76a65d41b82995e057b4b07f31d5a7b0291a9dce&v=0"
+              "icon_small_url": "https://files.openai.com/content?id=file_0000000095b871f5babdca78f206365c&cdn=1&cp=pi&ma=32313600&ts=0&p=pi&cid=1&sig=f046cd95222faacd30886b7e987b5d9b1cc104933bb50bae21a608cc840754d1&v=0",
+              "icon_large_url": "https://files.openai.com/content?id=file_0000000030c0720cb8003029f6a93d03&cdn=1&cp=pi&ma=31536000&ts=0&p=pi&cid=1&sig=63233b27e979a945d7dac6467dd4f5f1b346befa9afce725c9fc0e31f0860387&v=0"
             }
           },
           {
@@ -5705,8 +5705,8 @@
               "short_description": "Commit, push, and open a PR",
               "brand_color": null,
               "default_prompt": "Use $yeet to confirm the intended changes, create a focused commit, push it, and open a draft pull request.",
-              "icon_small_url": "https://files.openai.com/content?id=file_00000000dbd0720c98acd086ae843bce&cdn=1&cp=pi&ma=31449600&ts=0&p=pi&cid=1&sig=c0ee90a9edd983165858315dbe4e512912ab9387bf749b9f3c63c150b95376db&v=0",
-              "icon_large_url": "https://files.openai.com/content?id=file_00000000074c720cb20c4ec206f8ac83&cdn=1&cp=pi&ma=31449600&ts=0&p=pi&cid=1&sig=e73c3f01a71d5f83100d66c648143e13b44c776cd8ade5fb7c39c13701e79297&v=0"
+              "icon_small_url": "https://files.openai.com/content?id=file_0000000052dc720cb963511e84dc62e5&cdn=1&cp=pi&ma=31622400&ts=0&p=pi&cid=1&sig=853d5dc12fb174adf82e9f28248a1ab2da63d7f7a6efa49ec648df8b9ca02203&v=0",
+              "icon_large_url": "https://files.openai.com/content?id=file_000000009a2071f584578fced67e50b8&cdn=1&cp=pi&ma=30844800&ts=0&p=pi&cid=1&sig=d345fcd577483f7845fddfc7fb0f202bb2cd192a52252c623860ade523bd36ec&v=0"
             }
           }
         ]
@@ -13194,7 +13194,7 @@
       "authentication_policy": "ON_INSTALL",
       "status": "AVAILABLE",
       "release": {
-        "version": "1.3.2",
+        "version": "1.3.3",
         "display_name": "Shopify",
         "description": "Search Shopify docs, generate and validate GraphQL, Liquid, and UI extension code.",
         "bundle_download_url": null,
@@ -13230,8 +13230,8 @@
             "Generate and validate a Shopify GraphQL operation.",
             "Use Shopify CLI to run or troubleshoot a store workflow."
           ],
-          "composer_icon_url": "https://files.openai.com/content?id=file_00000000898c722fb758e71e8342a078&cdn=1&cp=pi&ma=31795200&ts=0&p=pi&cid=1&sig=3a8caf14edd5320bf6e5b8a121b6a9b4a8779436aa61722e0da8ec3db453d52f&v=0",
-          "logo_url": "https://files.openai.com/content?id=file_000000001660722f82215f94e756df6c&cdn=1&cp=pi&ma=31363200&ts=0&p=pi&cid=1&sig=7ec9f1363d73862ef6c564b9353eb1b8cc097f6ce34e3ae2d2dce8a1f13fc938&v=0",
+          "composer_icon_url": "https://files.openai.com/content?id=file_00000000e78071f7a0e14f3135c0ca00&cdn=1&cp=pi&ma=32659200&ts=0&p=pi&cid=1&sig=6d61745df4ba2e0271a084b39cd649360a2de3605f23cacb1087247e1c26cc0e&v=0",
+          "logo_url": "https://files.openai.com/content?id=file_00000000620c720cb620f98a9963cb13&cdn=1&cp=pi&ma=32745600&ts=0&p=pi&cid=1&sig=49ca1b6e69e31e1afcc0eaca61fdeab63864b713af5140ec732a46c53a0d9bf8&v=0",
           "screenshot_urls": []
         },
         "skills": [
@@ -15765,7 +15765,7 @@
       "authentication_policy": "ON_INSTALL",
       "status": "AVAILABLE",
       "release": {
-        "version": "0.21.2",
+        "version": "0.21.3",
         "display_name": "Vercel",
         "description": "Build and deploy web apps and agents",
         "bundle_download_url": null,
@@ -15801,8 +15801,8 @@
             "Which Vercel tools fit this app best",
             "Help wire the Vercel app into this workflow"
           ],
-          "composer_icon_url": "https://files.openai.com/content?id=file_00000000ab9871f597ec3136846f20bd&cdn=1&cp=pi&ma=31881600&ts=0&p=pi&cid=1&sig=2430b6647b17fb0d305c95df93c0d54bb5af1d2e7e3dedd9d1b5449ad4659590&v=0",
-          "logo_url": "https://files.openai.com/content?id=file_00000000a9b0722f81d112cf8b49a719&cdn=1&cp=pi&ma=30326400&ts=0&p=pi&cid=1&sig=b23a37937edb640d78d4e582bf7233f871f6b93eb535f2061000e97947ea887d&v=0",
+          "composer_icon_url": "https://files.openai.com/content?id=file_000000005684722f93270c4116b4e952&cdn=1&cp=pi&ma=32486400&ts=0&p=pi&cid=1&sig=5126dd11b1a6bb4b2c4dff18a7cc6a7fb3385d019a8935979b4fa8d21e0c6a44&v=0",
+          "logo_url": "https://files.openai.com/content?id=file_000000007660720c823af3a5508e0022&cdn=1&cp=pi&ma=32140800&ts=0&p=pi&cid=1&sig=389ef9727743351bcdd4c1c3fc2540898256fb1c70bf97c09f59d85d5f3264dc&v=0",
           "screenshot_urls": []
         },
         "skills": [
