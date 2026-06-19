@@ -24,19 +24,17 @@ export default async function TodayPage() {
           </form>
         </header>
 
-        <section className="mt-6 rounded-lg border border-border bg-card p-5">
+        <section className="relative mt-6 overflow-hidden rounded-lg border border-border bg-card p-5">
+          <WellnessMascot className="pointer-events-none absolute right-3 top-4 h-32 w-24 opacity-[0.69]" />
           <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
             <Dumbbell aria-hidden="true" className="h-4 w-4" />
             今日預排訓練
           </div>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold">今天還沒有安排訓練</h2>
-              <p className="mt-3 leading-7 text-muted-foreground">
-                先替未來的自己準備好，到了現場就不用再想。
-              </p>
-            </div>
-            <WellnessMascot className="mt-1 h-20 w-14 shrink-0 opacity-85" />
+          <div className="relative z-10 max-w-[78%]">
+            <h2 className="text-2xl font-semibold">今天還沒有安排訓練</h2>
+            <p className="mt-3 leading-7 text-muted-foreground">
+              先替未來的自己準備好，到了現場就不用再想。
+            </p>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-2">
             <Button type="button">記錄現在</Button>
