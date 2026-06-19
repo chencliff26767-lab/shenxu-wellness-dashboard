@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cliff Wellness Journal",
-  description: "Private wellness dashboard for Cliff and coach.",
+  title: "Wellness Journal",
+  description: "Private wellness dashboard for one owner and an authorized coach.",
   robots: {
     index: false,
     follow: false,

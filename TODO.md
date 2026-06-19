@@ -1,17 +1,32 @@
-# Cliff Wellness Journal TODO
+# Wellness Journal TODO
 
 ## Sprint 1: Foundation
 
-- [ ] Initialize Next.js App Router frontend with TypeScript strict mode.
-- [ ] Add Tailwind CSS, minimal shadcn-style primitives, and warm mobile-first design tokens.
-- [ ] Build `/login`, `/today`, `/settings/access`, `/auth/callback`, and `/` redirect behavior.
-- [ ] Add Supabase browser/server clients using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-- [ ] Add Google OAuth and Email Magic Link sign-in actions.
-- [ ] Add auth refresh/protected-route proxy.
-- [ ] Add owner/coach foundation tables with RLS.
-- [ ] Add private storage bucket migration notes and policies.
-- [ ] Add root npm scripts so `npm run dev` works from the repo root.
-- [ ] Verify `npm run lint`, `npm run typecheck`, and `npm run build`.
+- [x] Initialize Next.js App Router frontend with TypeScript strict mode.
+- [x] Add Tailwind CSS, minimal shadcn-style primitives, and warm mobile-first design tokens.
+- [x] Build `/login`, `/today`, `/settings/access`, `/auth/callback`, and `/` redirect behavior.
+- [x] Add Supabase browser/server clients using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+- [x] Add Google OAuth and Email Magic Link sign-in actions.
+- [x] Add auth refresh/protected-route proxy.
+- [x] Add owner/coach foundation tables with RLS.
+- [x] Add private storage bucket migration notes and policies.
+- [x] Add root npm scripts so `npm run dev` works from the repo root.
+- [x] Verify `npm run lint`, `npm run typecheck`, and `npm run build`.
+- [x] Remove hard-coded owner name from the UI and support a local display-name setting.
+- [ ] Persist display name in Supabase owner profile after real login is enabled.
+
+## Setup / Deployment
+
+- [ ] Create Supabase project.
+- [ ] Apply `supabase/migrations/001_foundation.sql`.
+- [ ] Configure Supabase Auth redirect URLs for localhost and production.
+- [ ] Configure Google OAuth in Google Cloud and Supabase.
+- [ ] Fill `frontend/.env.local` for real local login.
+- [ ] Push repository to GitHub.
+- [ ] Create Vercel project from the GitHub repository.
+- [ ] Add Vercel environment variables.
+- [ ] Confirm production login and `/today` redirect.
+- [ ] Test on iPhone Safari and iPhone Add to Home Screen.
 
 ## Sprint 2: Body Metrics
 

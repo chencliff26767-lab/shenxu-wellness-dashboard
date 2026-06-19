@@ -1,6 +1,7 @@
 import { Activity, Mail } from "lucide-react";
 import Link from "next/link";
 import { signInWithGoogle, signInWithMagicLink } from "@/app/actions/auth";
+import { DisplayNameSetup } from "@/components/display-name-setup";
 import { Button } from "@/components/ui/button";
 import { WellnessMascot } from "@/components/wellness-mascot";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -30,16 +31,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
           <div className="relative space-y-3">
             <WellnessMascot className="pointer-events-none absolute -right-4 -top-16 z-10 h-48 w-36 opacity-[0.69]" />
-            <div className="relative z-20 space-y-3">
-              <h1 className="text-4xl font-semibold leading-tight">Cliff Wellness Journal</h1>
-              <p className="text-base leading-7 text-muted-foreground">
-                在緩慢的日子裡，也留下身體前進的痕跡。
-              </p>
+            <div className="relative z-20">
+              <DisplayNameSetup />
             </div>
           </div>
 
           <div className="rounded-lg border border-border bg-card p-4 text-sm leading-6 text-card-foreground">
-            只有 Cliff 與已授權教練能查看資料。未授權帳號登入後不會看到健康紀錄。
+            只有本人與已授權教練能查看資料。未授權帳號登入後不會看到健康紀錄。
           </div>
         </div>
 

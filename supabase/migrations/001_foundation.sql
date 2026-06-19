@@ -1,6 +1,6 @@
 create table if not exists public.app_owners (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  display_name text not null default 'Cliff',
+  display_name text not null default 'Owner',
   created_at timestamptz not null default now()
 );
 
