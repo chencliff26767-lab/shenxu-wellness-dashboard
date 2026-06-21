@@ -5,12 +5,12 @@ Private iPhone-first wellness dashboard for one owner and an authorized coach.
 ## What Works Now
 
 - `npm run dev` starts the local Next.js app.
-- `/login` and `/today` render.
+- Authentication, body metrics, meals, training plans/records, coach collaboration, photos, reports, and PWA flows are implemented.
 - Local demo mode works without Supabase env.
 - The login page can set a local display name. For example, setting `Cliff` displays `Cliff Wellness Journal`.
-- Supabase auth wiring and the first RLS migration exist.
+- Supabase Auth, PostgreSQL, Storage, and RLS migrations are included.
 
-Real login, database writes, photo upload, and public phone testing require Supabase and Vercel setup.
+Real login, database writes, photo upload, and public phone testing require the documented Supabase and Vercel setup.
 
 ## Local Setup
 
@@ -73,7 +73,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=Wellness Journal
 ```
 
-4. Apply `supabase/migrations/001_foundation.sql` in the Supabase SQL Editor.
+4. Apply every file in `supabase/migrations/` in numeric order.
 5. In Supabase Auth URL settings, add local redirect URLs:
 
 ```text
@@ -107,7 +107,7 @@ Magic Link can be used first if Google OAuth setup is not ready.
 
 ## Vercel Deployment
 
-Use Vercel when you want a public URL for phone testing and production.
+Use the complete [production deployment runbook](docs/DEPLOYMENT.md). The minimum setup is:
 
 1. Push this repository to GitHub.
 2. Create a Vercel project and import the GitHub repository.
@@ -134,17 +134,6 @@ https://your-vercel-project.vercel.app/**
 Vercel docs:
 - https://vercel.com/docs/frameworks/full-stack/nextjs
 
-## Recommended Next Step
-
-For this project, do this order:
-
-1. Create Supabase project and apply the first migration.
-2. Fill `frontend/.env.local` and verify Magic Link or Google Login locally.
-3. Build Sprint 2 Body Metrics so there is something real to save.
-4. Push to GitHub and deploy to Vercel for iPhone testing.
-
-Do not start with Vercel alone. Without Supabase, the deployed site can render pages but cannot log in or save records.
-
 ## Checks
 
 ```powershell
@@ -155,4 +144,4 @@ npm run build
 
 ## Current Scope
 
-Sprint 1 foundation only: local frontend shell, Supabase auth plumbing, initial RLS migration, and concrete project TODOs. Later sprints are tracked in `TODO.md`.
+Application sprints are implemented through production hardening. Remaining external deployment and device verification tasks are tracked in `TODO.md`.

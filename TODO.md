@@ -122,4 +122,4 @@
 - [x] Loading skeletons and error boundaries.
 - [x] Accessibility pass, including VoiceOver basics.
 - [x] Export and backup flows.
-- [ ] Deployment hardening.
+- [x] Deployment hardening.
