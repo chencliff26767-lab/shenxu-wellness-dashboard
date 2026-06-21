@@ -13,12 +13,20 @@ function asOptionalText(value: FormDataEntryValue | null) {
 }
 
 function asNumber(value: FormDataEntryValue | null) {
-  const parsed = Number(value);
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return null;
+  }
+  const parsed = Number(text);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
 function asInteger(value: FormDataEntryValue | null) {
-  const parsed = Number(value);
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return null;
+  }
+  const parsed = Number(text);
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
 }
 
@@ -177,6 +185,44 @@ export async function deleteWorkout(formData: FormData) {
   }
 
   const { error } = await supabase.from("workout_sessions").delete().eq("id", id);
+  if (error) {
+    redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/workouts");
+}
+
+export async function updateWorkoutSet(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const id = String(formData.get("id") || "");
+  if (!id) {
+    redirect("/workouts?error=missing-set-id");
+  }
+
+  const intensity = asNumber(formData.get("actual_intensity"));
+  if (intensity != null && intensity > 10) {
+    redirect("/workouts?error=invalid-set-intensity");
+  }
+
+  const { error } = await supabase
+    .from("workout_sets")
+    .update({
+      actual_weight_kg: asNumber(formData.get("actual_weight_kg")),
+      actual_reps: asInteger(formData.get("actual_reps")),
+      actual_duration_min: asInteger(formData.get("actual_duration_min")),
+      actual_intensity: intensity,
+      completed_at: formData.has("completed") ? new Date().toISOString() : null,
+    })
+    .eq("id", id);
+
   if (error) {
     redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
   }

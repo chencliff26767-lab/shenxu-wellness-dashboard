@@ -38,8 +38,8 @@
 - [x] Body metric delete action.
 - [x] Weight, waist, and BMI.
 - [x] Seven-day average.
-- [ ] Apply `supabase/migrations/002_body_metrics.sql`.
-- [ ] Apply `supabase/migrations/003_body_metrics_inbody.sql`.
+- [x] Apply `supabase/migrations/002_body_metrics.sql`.
+- [x] Apply `supabase/migrations/003_body_metrics_inbody.sql`.
 - [x] InBody record form for occasional measurements.
 - [x] InBody values included in create and edit flow.
 - [x] Latest InBody values shown in body summary.
@@ -58,7 +58,7 @@
 - [x] Client-side WebP compression.
 - [x] Compress meal photos to max 1280px wide and 500KB.
 - [x] Private storage path and signed URL display.
-- [ ] Apply `supabase/migrations/004_meal_entries.sql`.
+- [x] Apply `supabase/migrations/004_meal_entries.sql`.
 - [ ] Copy previous meal.
 - [ ] Delete orphaned display/thumbnail files.
 
@@ -70,8 +70,9 @@
 - [x] Strength, cardio, Pilates, running, tennis, and custom workout fields.
 - [x] Weight, set count, reps, duration, and intensity tracking.
 - [x] Session-level and exercise-level pain notes.
-- [ ] Apply `supabase/migrations/005_workout_sessions.sql`.
-- [ ] Per-set inline editing/check flow.
+- [x] Apply `supabase/migrations/005_workout_sessions.sql`.
+- [ ] Apply `supabase/migrations/006_workout_set_completion.sql`.
+- [x] Per-set inline editing/check flow.
 
 ## Sprint 5: Workout Planning
 
