@@ -119,7 +119,7 @@
 ## Sprint 9: Polish
 
 - [x] PWA metadata and install behavior.
-- [ ] Loading skeletons and error boundaries.
+- [x] Loading skeletons and error boundaries.
 - [ ] Accessibility pass, including VoiceOver basics.
 - [ ] Export and backup flows.
 - [ ] Deployment hardening.
