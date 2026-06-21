@@ -6,7 +6,7 @@ const items = [
   { label: "計畫", href: "/plans", icon: CalendarDays },
   { label: "飲食", href: "/meals", icon: Plus },
   { label: "身材", href: "/body", icon: BookOpen },
-  { label: "教練", href: "/settings/access", icon: UserRound },
+  { label: "教練", href: "/coach", icon: UserRound },
 ];
 
 export function BottomNav() {

@@ -99,11 +99,12 @@
 
 ## Sprint 7: Coach
 
-- [ ] Coach relationship lifecycle.
-- [ ] Coach read access and feedback.
-- [ ] Weekly goals.
-- [ ] Plan adherence summary and attention list.
-- [ ] Access revocation.
+- [x] Coach relationship lifecycle.
+- [x] Coach read access and feedback.
+- [x] Weekly goals.
+- [x] Plan adherence summary and attention list.
+- [x] Access revocation.
+- [x] Apply `supabase/migrations/011_coach_collaboration.sql`.
 
 ## Sprint 8: Photo Storage Optimization
 
