@@ -345,7 +345,7 @@ function Input({
 
 function initialExercises(session?: WorkoutSession) {
   if (!session?.workout_exercises?.length) {
-    return [blankExercise()];
+    return [blankExercise(`exercise-${session?.id || "new"}-1`)];
   }
 
   return session.workout_exercises.map((exercise) => {
@@ -365,9 +365,9 @@ function initialExercises(session?: WorkoutSession) {
   });
 }
 
-function blankExercise(): ExerciseFormState {
+function blankExercise(key = crypto.randomUUID()): ExerciseFormState {
   return {
-    key: crypto.randomUUID(),
+    key,
     exercise_type: "strength",
     name: "",
     set_count: "1",
