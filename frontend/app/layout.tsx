@@ -43,7 +43,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="zh-Hant">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <a className="skip-link" href="#main-content">跳到主要內容</a>
+        <div id="main-content" tabIndex={-1}>{children}</div>
         <PwaInstallHint />
       </body>
     </html>

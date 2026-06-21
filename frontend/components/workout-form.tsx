@@ -285,20 +285,17 @@ function Field({
   type?: string;
 }) {
   return (
-    <>
-      <label className="block text-sm font-medium" htmlFor={`${name}-${label}`}>
+    <label className="block text-sm font-medium">
         {label}
-      </label>
       <input
-        className="min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
+        className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
         defaultValue={defaultValue}
-        id={`${name}-${label}`}
         name={name}
         placeholder={placeholder}
         required={required}
         type={type}
       />
-    </>
+    </label>
   );
 }
 
@@ -322,13 +319,10 @@ function Input({
   value: string;
 }) {
   return (
-    <>
-      <label className="block text-sm font-medium" htmlFor={`${name}-${label}`}>
+    <label className="block text-sm font-medium">
         {label}
-      </label>
       <input
-        className="mb-3 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
-        id={`${name}-${label}`}
+        className="mb-3 mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
         inputMode={type === "number" ? "decimal" : undefined}
         min={type === "number" ? "0" : undefined}
         name={name}
@@ -339,7 +333,7 @@ function Input({
         type={type}
         value={value}
       />
-    </>
+    </label>
   );
 }
 

@@ -107,10 +107,10 @@ export default async function WorkoutsPage({ searchParams }: WorkoutsPageProps) 
         <h1 className="mt-1 text-3xl font-semibold">訓練</h1>
 
         {params?.saved || params?.updated || params?.setUpdated || params?.started || params?.finished ? (
-          <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">變更已儲存。</p>
+          <p aria-live="polite" className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">變更已儲存。</p>
         ) : null}
         {params?.error ? (
-          <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">儲存失敗：{params.error}</p>
+          <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">儲存失敗：{params.error}</p>
         ) : null}
 
         <section className="mt-6 space-y-3">

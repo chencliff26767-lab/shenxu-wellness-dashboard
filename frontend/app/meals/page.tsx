@@ -53,11 +53,11 @@ export default async function MealsPage({ searchParams }: MealsPageProps) {
             餐點、照片與備註
           </div>
 
-          {params?.saved ? <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已儲存。</p> : null}
-          {params?.updated ? <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已更新。</p> : null}
-          {params?.cleaned != null ? <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已清理 {params.cleaned} 個孤兒檔案。</p> : null}
+          {params?.saved ? <p aria-live="polite" className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">已儲存。</p> : null}
+          {params?.updated ? <p aria-live="polite" className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">已更新。</p> : null}
+          {params?.cleaned != null ? <p aria-live="polite" className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">已清理 {params.cleaned} 個孤兒檔案。</p> : null}
           {params?.error ? (
-            <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">儲存失敗：{params.error}</p>
+            <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">儲存失敗：{params.error}</p>
           ) : null}
 
           <MealForm action={createMeal} submitLabel="儲存飲食紀錄" />

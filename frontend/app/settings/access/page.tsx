@@ -48,8 +48,8 @@ export default async function AccessPage({ searchParams }: AccessPageProps) {
         <p className="text-sm text-muted-foreground">設定</p>
         <h1 className="mt-1 text-3xl font-semibold">教練存取權</h1>
 
-        {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">操作失敗：{params.error}</p> : null}
-        {params?.invited ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">邀請已建立。</p> : null}
+        {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">操作失敗：{params.error}</p> : null}
+        {params?.invited ? <p aria-live="polite" className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">邀請已建立。</p> : null}
 
         {params?.invite ? (
           <section className="mt-6 rounded-lg border border-border bg-card p-5">

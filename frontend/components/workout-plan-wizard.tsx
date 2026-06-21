@@ -117,6 +117,7 @@ export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanW
         {steps.map((label, index) => (
           <li className="text-center" key={label}>
             <span
+              aria-current={index === step ? "step" : undefined}
               className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
                 index <= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}

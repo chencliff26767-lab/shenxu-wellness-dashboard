@@ -43,17 +43,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <div className="relative z-10 space-y-3">
           {missingSetup ? (
-            <p className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
+            <p className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground" role="alert">
               尚未設定 Supabase env。先填 `frontend/.env.local` 後即可測登入。
             </p>
           ) : null}
           {params?.sent ? (
-            <p className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
+            <p aria-live="polite" className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground" role="status">
               Magic Link 已送出，請查看信箱。
             </p>
           ) : null}
           {params?.error ? (
-            <p className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
+            <p className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground" role="alert">
               登入暫時失敗，請確認設定後再試一次。
             </p>
           ) : null}

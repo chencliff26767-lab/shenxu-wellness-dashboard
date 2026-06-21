@@ -119,8 +119,8 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
           </Link>
         </div>
 
-        {params?.saved || params?.cloned || params?.updated ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">計畫已更新。</p> : null}
-        {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">操作失敗：{params.error}</p> : null}
+        {params?.saved || params?.cloned || params?.updated ? <p aria-live="polite" className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">計畫已更新。</p> : null}
+        {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">操作失敗：{params.error}</p> : null}
 
         <section className="mt-6 rounded-lg border border-border bg-card p-3">
           <div className="flex items-center justify-between gap-2">

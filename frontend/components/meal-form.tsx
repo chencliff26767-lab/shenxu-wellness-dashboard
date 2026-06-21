@@ -82,7 +82,7 @@ export function MealForm({ action, meal, submitLabel }: MealFormProps) {
 }
 
 function Field({ defaultValue, label, name, type }: { defaultValue?: string; label: string; name: string; type: "date" }) {
-  return <><label className="block text-sm font-medium" htmlFor={`${name}-${label}`}>{label}</label><input className="min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary" defaultValue={defaultValue} id={`${name}-${label}`} name={name} required type={type} /></>;
+  return <label className="block text-sm font-medium">{label}<input className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary" defaultValue={defaultValue} name={name} required type={type} /></label>;
 }
 
 async function compressAdaptive(image: HTMLImageElement, maxWidth: number, targetBytes: number, hardLimitBytes: number, filename: string) {

@@ -2,7 +2,7 @@ export function PageSkeleton() {
   return (
     <main aria-busy="true" aria-label="頁面載入中" className="min-h-dvh pb-[calc(88px+env(safe-area-inset-bottom))]">
       <span className="sr-only">正在載入內容</span>
-      <div className="mx-auto w-full max-w-md animate-pulse px-5 pt-[calc(24px+env(safe-area-inset-top))]">
+      <div className="mx-auto w-full max-w-md px-5 pt-[calc(24px+env(safe-area-inset-top))] motion-safe:animate-pulse">
         <div className="h-4 w-24 rounded bg-muted" />
         <div className="mt-3 h-9 w-40 rounded bg-muted" />
         <div className="mt-7 grid grid-cols-2 gap-2">

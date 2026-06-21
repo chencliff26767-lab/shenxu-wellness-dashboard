@@ -50,13 +50,13 @@ export default async function BodyPage({ searchParams }: BodyPageProps) {
           </div>
 
           {params?.saved ? (
-            <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已儲存。</p>
+            <p aria-live="polite" className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">已儲存。</p>
           ) : null}
           {params?.updated ? (
-            <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已更新。</p>
+            <p aria-live="polite" className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">已更新。</p>
           ) : null}
           {params?.error ? (
-            <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">
+            <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">
               儲存失敗：{params.error}
             </p>
           ) : null}
@@ -243,14 +243,11 @@ function Field({
   type: "date" | "number";
 }) {
   return (
-    <>
-      <label className="block text-sm font-medium" htmlFor={`${name}-${label}`}>
+    <label className="block text-sm font-medium">
         {label}
-      </label>
       <input
-        className="min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
+        className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
         defaultValue={defaultValue}
-        id={`${name}-${label}`}
         inputMode={type === "number" ? "decimal" : undefined}
         min={type === "number" ? "0" : undefined}
         name={name}
@@ -259,7 +256,7 @@ function Field({
         step={step}
         type={type}
       />
-    </>
+    </label>
   );
 }
 

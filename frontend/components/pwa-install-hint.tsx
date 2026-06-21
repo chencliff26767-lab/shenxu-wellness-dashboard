@@ -44,14 +44,14 @@ export function PwaInstallHint() {
   }
 
   return (
-    <aside className="fixed inset-x-3 bottom-[calc(82px+env(safe-area-inset-bottom))] z-50 mx-auto max-w-md rounded-lg border border-border bg-card p-3 shadow-lg" aria-label="安裝 App">
+    <aside aria-label="安裝 App" aria-live="polite" className="fixed inset-x-3 bottom-[calc(82px+env(safe-area-inset-bottom))] z-50 mx-auto max-w-md rounded-lg border border-border bg-card p-3 shadow-lg" role="region">
       <div className="flex items-start gap-3">
         {showIosHelp ? <Share aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-primary" /> : <Download aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-primary" />}
         <div className="min-w-0 flex-1">
           <p className="font-medium">加到主畫面</p>
           {showIosHelp ? <p className="mt-1 text-sm text-muted-foreground">點 Safari 的分享按鈕，再選「加入主畫面」。</p> : <button className="mt-2 min-h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" onClick={install} type="button">安裝 Wellness</button>}
         </div>
-        <button aria-label="關閉安裝提示" className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground" onClick={dismiss} type="button"><X aria-hidden="true" className="h-4 w-4" /></button>
+        <button aria-label="關閉安裝提示" className="flex h-11 w-11 shrink-0 items-center justify-center text-muted-foreground" onClick={dismiss} type="button"><X aria-hidden="true" className="h-4 w-4" /></button>
       </div>
     </aside>
   );

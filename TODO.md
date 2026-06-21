@@ -120,6 +120,6 @@
 
 - [x] PWA metadata and install behavior.
 - [x] Loading skeletons and error boundaries.
-- [ ] Accessibility pass, including VoiceOver basics.
+- [x] Accessibility pass, including VoiceOver basics.
 - [ ] Export and backup flows.
 - [ ] Deployment hardening.

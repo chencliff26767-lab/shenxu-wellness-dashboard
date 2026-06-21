@@ -64,8 +64,8 @@ export default async function CoachPage({ searchParams }: CoachPageProps) {
           <Link aria-label="教練權限設定" className="flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card" href="/settings/access"><Settings aria-hidden="true" className="h-5 w-5" /></Link>
         </div>
 
-        {params?.accepted || params?.feedback || params?.goal ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">變更已儲存。</p> : null}
-        {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground">操作失敗：{params.error}</p> : null}
+        {params?.accepted || params?.feedback || params?.goal ? <p aria-live="polite" className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">變更已儲存。</p> : null}
+        {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">操作失敗：{params.error}</p> : null}
 
         <section className="mt-6">
           <p className="text-sm text-muted-foreground">{formatDate(weekStart)}－{formatDate(weekEnd)}</p>
