@@ -60,7 +60,7 @@
 - [x] Private storage path and signed URL display.
 - [x] Apply `supabase/migrations/004_meal_entries.sql`.
 - [ ] Copy previous meal.
-- [ ] Delete orphaned display/thumbnail files.
+- [x] Delete orphaned display/thumbnail files.
 
 ## Sprint 4: Manual Workouts
 
@@ -108,15 +108,17 @@
 
 ## Sprint 8: Photo Storage Optimization
 
-- [ ] Adaptive WebP compression.
-- [ ] Display target 80-180KB, hard limit 500KB.
-- [ ] Thumbnail target 15-40KB.
+- [x] Adaptive WebP compression.
+- [x] Display target 80-180KB, hard limit 500KB.
+- [x] Thumbnail target 15-40KB.
+- [x] HEIC/HEIF detection and browser fallback.
 - [ ] HEIC/HEIF iPhone validation.
-- [ ] Storage usage estimate and orphan cleanup.
+- [x] Storage usage estimate and orphan cleanup.
+- [x] Apply `supabase/migrations/012_photo_storage_optimization.sql`.
 
 ## Sprint 9: Polish
 
-- [ ] PWA metadata and install behavior.
+- [x] PWA metadata and install behavior.
 - [ ] Loading skeletons and error boundaries.
 - [ ] Accessibility pass, including VoiceOver basics.
 - [ ] Export and backup flows.

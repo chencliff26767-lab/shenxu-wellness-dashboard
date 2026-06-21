@@ -1,5 +1,6 @@
+import Image from "next/image";
 import { Edit3, ImageIcon, Trash2, Utensils } from "lucide-react";
-import { createMeal, deleteMeal, updateMeal } from "@/app/actions/meals";
+import { cleanupMealOrphans, createMeal, deleteMeal, updateMeal } from "@/app/actions/meals";
 import { BottomNav } from "@/components/bottom-nav";
 import { MealForm } from "@/components/meal-form";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -12,7 +13,11 @@ type MealEntry = {
   title: string;
   note: string | null;
   photo_path: string | null;
+  thumbnail_path: string | null;
+  photo_size_bytes: number | null;
+  thumbnail_size_bytes: number | null;
   photo_url?: string | null;
+  thumbnail_url?: string | null;
 };
 
 type MealsPageProps = {
@@ -20,6 +25,7 @@ type MealsPageProps = {
     error?: string;
     saved?: string;
     updated?: string;
+    cleaned?: string;
   }>;
 };
 
@@ -33,7 +39,7 @@ const mealTypeLabels: Record<string, string> = {
 
 export default async function MealsPage({ searchParams }: MealsPageProps) {
   const params = await searchParams;
-  const meals = await getMeals();
+  const [meals, storageBytes] = await Promise.all([getMeals(), getMealStorageUsage()]);
 
   return (
     <main className="min-h-dvh pb-[calc(88px+env(safe-area-inset-bottom))]">
@@ -49,11 +55,17 @@ export default async function MealsPage({ searchParams }: MealsPageProps) {
 
           {params?.saved ? <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已儲存。</p> : null}
           {params?.updated ? <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已更新。</p> : null}
+          {params?.cleaned != null ? <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">已清理 {params.cleaned} 個孤兒檔案。</p> : null}
           {params?.error ? (
             <p className="mb-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">儲存失敗：{params.error}</p>
           ) : null}
 
           <MealForm action={createMeal} submitLabel="儲存飲食紀錄" />
+        </section>
+
+        <section className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
+          <div><p className="text-xs text-muted-foreground">餐點圖片 Storage 估算</p><p className="mt-1 font-semibold">{formatBytes(storageBytes)}</p></div>
+          <form action={cleanupMealOrphans}><button className="min-h-11 rounded-md border border-border px-3 text-sm" type="submit">清理孤兒檔案</button></form>
         </section>
 
         <section className="mt-4 space-y-3">
@@ -78,7 +90,7 @@ async function getMeals(): Promise<MealEntry[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("meal_entries")
-    .select("id, eaten_on, meal_type, title, note, photo_path")
+    .select("id, eaten_on, meal_type, title, note, photo_path, thumbnail_path, photo_size_bytes, thumbnail_size_bytes")
     .order("eaten_on", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(30);
@@ -90,11 +102,12 @@ async function getMeals(): Promise<MealEntry[]> {
   return Promise.all(
     data.map(async (meal) => {
       if (!meal.photo_path) {
-        return { ...meal, photo_url: null };
+        return { ...meal, photo_url: null, thumbnail_url: null };
       }
 
-      const { data: signed } = await supabase.storage.from("wellness-private").createSignedUrl(meal.photo_path, 60 * 60);
-      return { ...meal, photo_url: signed?.signedUrl || null };
+      const paths = [meal.photo_path, meal.thumbnail_path || meal.photo_path];
+      const { data: signed } = await supabase.storage.from("wellness-private").createSignedUrls(paths, 60 * 60);
+      return { ...meal, photo_url: signed?.[0]?.signedUrl || null, thumbnail_url: signed?.[1]?.signedUrl || signed?.[0]?.signedUrl || null };
     }),
   );
 }
@@ -111,7 +124,6 @@ function MealCard({ meal }: { meal: MealEntry }) {
         </div>
         <form action={deleteMeal}>
           <input name="id" type="hidden" value={meal.id} />
-          <input name="photo_path" type="hidden" value={meal.photo_path || ""} />
           <button
             aria-label="刪除飲食紀錄"
             className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
@@ -122,8 +134,10 @@ function MealCard({ meal }: { meal: MealEntry }) {
         </form>
       </div>
 
-      {meal.photo_url ? (
-        <img alt={meal.title} className="mt-3 aspect-[4/3] w-full rounded-md object-cover" src={meal.photo_url} />
+      {meal.photo_url && meal.thumbnail_url ? (
+        <a href={meal.photo_url} rel="noreferrer" target="_blank">
+          <Image alt={meal.title} className="mt-3 aspect-[4/3] w-full rounded-md object-cover" height={360} sizes="(max-width: 448px) 100vw, 448px" src={meal.thumbnail_url} unoptimized width={480} />
+        </a>
       ) : (
         <div className="mt-3 flex min-h-24 items-center justify-center rounded-md bg-muted text-sm text-muted-foreground">
           <ImageIcon aria-hidden="true" className="mr-2 h-4 w-4" />
@@ -144,4 +158,18 @@ function MealCard({ meal }: { meal: MealEntry }) {
       </details>
     </article>
   );
+}
+
+async function getMealStorageUsage() {
+  if (!isSupabaseConfigured()) return 0;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+  const { data } = await supabase.storage.from("wellness-private").list(`${user.id}/meals`, { limit: 1000 });
+  return (data || []).reduce((total, file) => total + Number(file.metadata?.size || 0), 0);
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
