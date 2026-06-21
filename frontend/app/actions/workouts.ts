@@ -164,6 +164,11 @@ export async function updateWorkout(formData: FormData) {
     redirect("/workouts?error=missing-id");
   }
 
+  const { data: existing } = await supabase.from("workout_sessions").select("workout_plan_id").eq("id", id).single();
+  if (existing?.workout_plan_id) {
+    redirect("/workouts?error=planned-session-snapshot-is-locked");
+  }
+
   const payload = sessionPayload(formData, user.id);
   const { error } = await supabase.from("workout_sessions").update(payload).eq("id", id);
 
@@ -182,6 +187,11 @@ export async function deleteWorkout(formData: FormData) {
 
   if (!id) {
     redirect("/workouts?error=missing-id");
+  }
+
+  const { data: existing } = await supabase.from("workout_sessions").select("workout_plan_id").eq("id", id).single();
+  if (existing?.workout_plan_id) {
+    redirect("/workouts?error=planned-session-cannot-be-deleted");
   }
 
   const { error } = await supabase.from("workout_sessions").delete().eq("id", id);
@@ -208,24 +218,115 @@ export async function updateWorkoutSet(formData: FormData) {
   }
 
   const intensity = asNumber(formData.get("actual_intensity"));
+  const rpe = asInteger(formData.get("actual_rpe"));
+  const rir = asInteger(formData.get("actual_rir"));
   if (intensity != null && intensity > 10) {
     redirect("/workouts?error=invalid-set-intensity");
   }
+  if ((rpe != null && (rpe < 1 || rpe > 10)) || (rir != null && rir > 10)) {
+    redirect("/workouts?error=invalid-set-effort");
+  }
 
-  const { error } = await supabase
-    .from("workout_sets")
-    .update({
-      actual_weight_kg: asNumber(formData.get("actual_weight_kg")),
-      actual_reps: asInteger(formData.get("actual_reps")),
-      actual_duration_min: asInteger(formData.get("actual_duration_min")),
-      actual_intensity: intensity,
-      completed_at: formData.has("completed") ? new Date().toISOString() : null,
-    })
-    .eq("id", id);
+  const payload: Record<string, string | number | null> = {
+    completed_at: String(formData.get("completed")) === "true" ? new Date().toISOString() : null,
+    note: asOptionalText(formData.get("note")),
+    pain_note: asOptionalText(formData.get("pain_note")),
+    fatigue_note: asOptionalText(formData.get("fatigue_note")),
+    equipment_note: asOptionalText(formData.get("equipment_note")),
+  };
+  if (formData.has("actual_weight_kg")) payload.actual_weight_kg = asNumber(formData.get("actual_weight_kg"));
+  if (formData.has("actual_reps")) payload.actual_reps = asInteger(formData.get("actual_reps"));
+  if (formData.has("actual_duration_min")) payload.actual_duration_min = asInteger(formData.get("actual_duration_min"));
+  if (formData.has("actual_duration_seconds")) payload.actual_duration_seconds = asInteger(formData.get("actual_duration_seconds"));
+  if (formData.has("actual_distance_m")) payload.actual_distance_m = asNumber(formData.get("actual_distance_m"));
+  if (formData.has("actual_intensity")) payload.actual_intensity = intensity;
+  if (formData.has("actual_rpe")) payload.actual_rpe = rpe;
+  if (formData.has("actual_rir")) payload.actual_rir = rir;
+
+  const { error } = await supabase.from("workout_sets").update(payload).eq("id", id);
 
   if (error) {
     redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
   }
 
+  const { error: syncError } = await supabase.rpc("sync_workout_progress", { target_set_id: id });
+  if (syncError) {
+    redirect(`/workouts?error=${encodeURIComponent(syncError.message)}`);
+  }
+
   revalidatePath("/workouts");
+  revalidatePath("/plans");
+}
+
+export async function updateWorkoutExerciseNotes(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  if (!id) redirect("/workouts?error=missing-exercise-id");
+  const { error } = await supabase
+    .from("workout_exercises")
+    .update({
+      note: asOptionalText(formData.get("note")),
+      pain_note: asOptionalText(formData.get("pain_note")),
+      fatigue_note: asOptionalText(formData.get("fatigue_note")),
+      equipment_note: asOptionalText(formData.get("equipment_note")),
+    })
+    .eq("id", id);
+  if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/workouts");
+}
+
+export async function updateWorkoutSessionSummary(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  const scheduledAt = String(formData.get("scheduled_at") || "").trim();
+  const overallRpe = asInteger(formData.get("overall_rpe"));
+  const painScore = asInteger(formData.get("pain_score"));
+  if (!id || !scheduledAt || (overallRpe != null && (overallRpe < 1 || overallRpe > 10)) || (painScore != null && painScore > 10)) {
+    redirect("/workouts?error=invalid-summary");
+  }
+  const { error } = await supabase
+    .from("workout_sessions")
+    .update({
+      scheduled_at: scheduledAt,
+      duration_minutes: asInteger(formData.get("duration_minutes")),
+      overall_rpe: overallRpe,
+      pain_score: painScore,
+      note: asOptionalText(formData.get("note")),
+      pain_note: asOptionalText(formData.get("pain_note")),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/workouts");
+  redirect(`/workouts?session=${id}&updated=1`);
+}
+
+export async function updateWorkoutSessionState(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  const intent = String(formData.get("intent") || "");
+  if (!id || !["pause", "resume"].includes(intent)) redirect("/workouts?error=invalid-session-state");
+  const { error } = await supabase
+    .from("workout_sessions")
+    .update(
+      intent === "pause"
+        ? { status: "paused", paused_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+        : { status: "in_progress", paused_at: null, updated_at: new Date().toISOString() },
+    )
+    .eq("id", id)
+    .eq("status", intent === "pause" ? "in_progress" : "paused");
+  if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/workouts");
+  revalidatePath("/plans");
+}
+
+export async function finishWorkoutSession(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  if (!id) redirect("/workouts?error=missing-session-id");
+  const { error } = await supabase.rpc("finish_workout_session", { target_session_id: id });
+  if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/workouts");
+  revalidatePath("/plans");
+  redirect(`/workouts?session=${id}&finished=1`);
 }

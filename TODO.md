@@ -86,13 +86,16 @@
 
 ## Sprint 6: Check-Based Workout Execution
 
-- [ ] `start_workout_plan` transaction.
-- [ ] Lock planned snapshot and create one actual session.
-- [ ] One-tap set completion with undo.
-- [ ] Inline actual value editing without changing planned values.
-- [ ] Per-set and per-exercise notes for pain, old injuries, fatigue, and equipment constraints.
-- [ ] Allow post-workout editing of RPE, pain score, time, and notes so logging does not interrupt training.
-- [ ] Autosave, pause/resume, partial completion, and summary.
+- [x] `start_workout_plan` transaction.
+- [x] Lock planned snapshot and create one actual session.
+- [x] Link plans, planned exercises, and planned sets to actual workout data.
+- [x] Apply `supabase/migrations/009_start_workout_plan.sql`.
+- [x] One-tap set completion with undo.
+- [x] Inline actual value editing without changing planned values.
+- [x] Per-set and per-exercise notes for pain, old injuries, fatigue, and equipment constraints.
+- [x] Allow post-workout editing of RPE, pain score, time, and notes so logging does not interrupt training.
+- [x] Autosave, pause/resume, partial completion, and summary.
+- [x] Apply `supabase/migrations/010_workout_execution.sql`.
 
 ## Sprint 7: Coach
 

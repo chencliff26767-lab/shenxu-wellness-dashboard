@@ -373,6 +373,21 @@ export async function updateWorkoutPlanStatus(formData: FormData) {
   redirect(`/plans?updated=1${returnDate ? `&day=${returnDate}` : ""}`);
 }
 
+export async function startWorkoutPlan(formData: FormData) {
+  const { supabase } = await requireUser();
+  const id = text(formData.get("id"));
+  if (!id) redirect("/plans?error=missing-plan-id");
+
+  const { data, error } = await supabase.rpc("start_workout_plan", { target_plan_id: id });
+  if (error || !data) {
+    redirect(`/plans?error=${encodeURIComponent(error?.message || "start-workout-failed")}`);
+  }
+
+  revalidatePath("/plans");
+  revalidatePath("/workouts");
+  redirect(`/workouts?session=${data}&started=1`);
+}
+
 function addDays(date: string, days: number) {
   const value = new Date(`${date}T12:00:00Z`);
   value.setUTCDate(value.getUTCDate() + days);

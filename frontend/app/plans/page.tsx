@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Plus } from "lucide-react";
+import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Play, Plus } from "lucide-react";
 import {
   clonePreviousWeek,
   cloneWorkoutPlan,
   rescheduleWorkoutPlan,
+  startWorkoutPlan,
   updateWorkoutPlanStatus,
 } from "@/app/actions/workout-plans";
 import { BottomNav } from "@/components/bottom-nav";
@@ -46,6 +47,7 @@ type WorkoutPlan = {
   skipped_reason: string | null;
   reschedule_count: number;
   locked_at: string | null;
+  workout_sessions: Array<{ id: string; status: string; scheduled_at: string }>;
   planned_exercises: PlannedExercise[];
 };
 
@@ -79,7 +81,10 @@ const statusLabels: Record<string, string> = {
 };
 const recordStatusLabels: Record<string, string> = {
   planned: "舊版安排",
+  in_progress: "進行中",
+  paused: "已暫停",
   completed: "已完成",
+  partial: "部分完成",
   skipped: "已略過",
   draft: "草稿",
 };
@@ -93,7 +98,11 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
   const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
   const [plans, workoutRecords] = await Promise.all([getPlans(weekStart, days[6]), getWorkoutRecords(weekStart, days[6])]);
   const selectedPlans = plans.filter((plan) => plan.scheduled_date === selectedDay);
-  const selectedRecords = workoutRecords.filter((record) => record.scheduled_at.slice(0, 10) === selectedDay);
+  const linkedSessionIds = new Set(plans.flatMap((plan) => plan.workout_sessions || []).map((session) => session.id));
+  // ponytail: plans outside the visible week cannot be de-duplicated here — ceiling: rare cross-week starts — upgrade: query sessions with their plan relation.
+  const selectedRecords = workoutRecords.filter(
+    (record) => record.scheduled_at.slice(0, 10) === selectedDay && !linkedSessionIds.has(record.id),
+  );
   const ownerId = await getDefaultOwnerId(plans, workoutRecords);
 
   return (
@@ -227,7 +236,7 @@ async function getPlans(start: string, end: string): Promise<WorkoutPlan[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("workout_plans")
-    .select("id, owner_id, title, workout_type, scheduled_date, scheduled_time, target_duration_minutes, status, focus_text, preparation_notes, skipped_reason, reschedule_count, locked_at, planned_exercises(id, position, name, variation, is_required, planned_sets(id, position, target_weight_kg, target_reps, target_duration_seconds, target_distance_m, target_rpe, target_rir, rest_seconds))")
+    .select("id, owner_id, title, workout_type, scheduled_date, scheduled_time, target_duration_minutes, status, focus_text, preparation_notes, skipped_reason, reschedule_count, locked_at, workout_sessions(id, status, scheduled_at), planned_exercises(id, position, name, variation, is_required, planned_sets(id, position, target_weight_kg, target_reps, target_duration_seconds, target_distance_m, target_rpe, target_rir, rest_seconds))")
     .gte("scheduled_date", start)
     .lte("scheduled_date", end)
     .order("scheduled_date")
@@ -240,6 +249,7 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
   const exercises = [...(plan.planned_exercises || [])].sort((a, b) => a.position - b.position);
   const setCount = exercises.reduce((total, exercise) => total + (exercise.planned_sets?.length || 0), 0);
   const editable = plan.status === "planned" && !plan.locked_at;
+  const session = plan.workout_sessions?.[0];
 
   return (
     <article className="rounded-lg border border-border bg-card p-4">
@@ -262,6 +272,21 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
       <ol className="mt-3 space-y-2">
         {exercises.map((exercise, index) => <ExerciseRow exercise={exercise} index={index} key={exercise.id} />)}
       </ol>
+
+      {editable ? (
+        <form action={startWorkoutPlan} className="mt-3">
+          <input name="id" type="hidden" value={plan.id} />
+          <Button className="w-full" type="submit">
+            <Play aria-hidden="true" className="h-4 w-4" />
+            開始訓練
+          </Button>
+        </form>
+      ) : session && plan.status === "in_progress" ? (
+        <Link className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground" href={`/workouts?session=${session.id}`}>
+          <Play aria-hidden="true" className="h-4 w-4" />
+          繼續訓練
+        </Link>
+      ) : null}
 
       {editable ? (
         <details className="mt-3 rounded-md border border-border">
