@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Plus } from "lucide-react";
+import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Plus } from "lucide-react";
 import {
   clonePreviousWeek,
   cloneWorkoutPlan,
@@ -49,6 +49,21 @@ type WorkoutPlan = {
   planned_exercises: PlannedExercise[];
 };
 
+type WorkoutRecord = {
+  id: string;
+  owner_id: string;
+  scheduled_at: string;
+  status: string;
+  title: string;
+  session_type: string;
+  workout_exercises: Array<{
+    id: string;
+    position: number;
+    name: string;
+    workout_sets: Array<{ id: string; completed_at: string | null }>;
+  }>;
+};
+
 type PlansPageProps = {
   searchParams?: Promise<{ week?: string; day?: string; saved?: string; cloned?: string; updated?: string; error?: string }>;
 };
@@ -62,6 +77,12 @@ const statusLabels: Record<string, string> = {
   skipped: "已略過",
   cancelled: "已取消",
 };
+const recordStatusLabels: Record<string, string> = {
+  planned: "舊版安排",
+  completed: "已完成",
+  skipped: "已略過",
+  draft: "草稿",
+};
 
 export default async function PlansPage({ searchParams }: PlansPageProps) {
   const params = await searchParams;
@@ -70,17 +91,18 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
   const selectedDay = validDate(params?.day) ? params.day! : requestedWeek ? startOfWeek(requestedWeek) : today;
   const weekStart = startOfWeek(requestedWeek || selectedDay);
   const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
-  const plans = await getPlans(weekStart, days[6]);
+  const [plans, workoutRecords] = await Promise.all([getPlans(weekStart, days[6]), getWorkoutRecords(weekStart, days[6])]);
   const selectedPlans = plans.filter((plan) => plan.scheduled_date === selectedDay);
-  const ownerId = await getDefaultOwnerId(plans);
+  const selectedRecords = workoutRecords.filter((record) => record.scheduled_at.slice(0, 10) === selectedDay);
+  const ownerId = await getDefaultOwnerId(plans, workoutRecords);
 
   return (
     <main className="min-h-dvh pb-[calc(88px+env(safe-area-inset-bottom))]">
       <div className="mx-auto w-full max-w-md px-5 pt-[calc(24px+env(safe-area-inset-top))]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm text-muted-foreground">Workout Planning</p>
-            <h1 className="mt-1 text-3xl font-semibold">週計畫</h1>
+            <p className="text-sm text-muted-foreground">計畫與紀錄</p>
+            <h1 className="mt-1 text-3xl font-semibold">訓練週覽</h1>
           </div>
           <Link className="flex min-h-11 items-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" href={`/plans/new?date=${selectedDay}${ownerId ? `&owner=${ownerId}` : ""}`}>
             <Plus aria-hidden="true" className="h-4 w-4" />
@@ -105,6 +127,7 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
           <div className="mt-2 grid grid-cols-7 gap-1">
             {days.map((day, index) => {
               const dayPlans = plans.filter((plan) => plan.scheduled_date === day);
+              const dayRecords = workoutRecords.filter((record) => record.scheduled_at.slice(0, 10) === day);
               const selected = day === selectedDay;
               return (
                 <Link
@@ -115,7 +138,10 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
                 >
                   <span>{weekdayLabels[index]}</span>
                   <span className="mt-1 text-base font-semibold">{Number(day.slice(8, 10))}</span>
-                  <span className={`mt-1 h-1.5 w-1.5 rounded-full ${dayPlans.length ? (selected ? "bg-primary-foreground" : "bg-primary") : "bg-transparent"}`} />
+                  <span className="mt-1 flex h-1.5 gap-0.5" aria-label={`${dayPlans.length} 個計畫，${dayRecords.length} 筆紀錄`}>
+                    {dayPlans.length ? <span className={`h-1.5 w-1.5 rounded-full ${selected ? "bg-primary-foreground" : "bg-primary"}`} /> : null}
+                    {dayRecords.length ? <span className={`h-1.5 w-1.5 rounded-full border ${selected ? "border-primary-foreground" : "border-primary"}`} /> : null}
+                  </span>
                 </Link>
               );
             })}
@@ -126,17 +152,26 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm text-muted-foreground">{selectedDay === today ? "今天" : selectedDay}</p>
-              <h2 className="text-xl font-semibold">{selectedPlans.length ? `${selectedPlans.length} 個計畫` : "尚未安排"}</h2>
+              <h2 className="text-xl font-semibold">{daySummary(selectedPlans.length, selectedRecords.length)}</h2>
             </div>
             <Link className="text-sm text-muted-foreground underline underline-offset-4" href="/workouts">訓練紀錄</Link>
           </div>
 
           <div className="mt-3 space-y-3">
-            {selectedPlans.length ? selectedPlans.map((plan) => <PlanCard key={plan.id} plan={plan} />) : (
+            {selectedPlans.map((plan) => <PlanCard key={plan.id} plan={plan} />)}
+            {selectedRecords.length ? (
+              <div className="pt-1">
+                <p className="mb-2 text-sm font-medium text-muted-foreground">當日訓練紀錄</p>
+                <div className="space-y-3">
+                  {selectedRecords.map((record) => <WorkoutRecordCard key={record.id} record={record} />)}
+                </div>
+              </div>
+            ) : null}
+            {!selectedPlans.length && !selectedRecords.length ? (
               <div className="rounded-lg border border-dashed border-border bg-card p-5 text-sm text-muted-foreground">
                 這天沒有計畫。休息也很好，或新增一個訓練安排。
               </div>
-            )}
+            ) : null}
           </div>
         </section>
 
@@ -154,8 +189,9 @@ export default async function PlansPage({ searchParams }: PlansPageProps) {
   );
 }
 
-async function getDefaultOwnerId(plans: WorkoutPlan[]) {
+async function getDefaultOwnerId(plans: WorkoutPlan[], records: WorkoutRecord[]) {
   if (plans[0]?.owner_id) return plans[0].owner_id;
+  if (records[0]?.owner_id) return records[0].owner_id;
   if (!isSupabaseConfigured()) return "";
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -171,6 +207,19 @@ async function getDefaultOwnerId(plans: WorkoutPlan[]) {
     .limit(1)
     .maybeSingle();
   return relationship?.owner_id || user.id;
+}
+
+async function getWorkoutRecords(start: string, end: string): Promise<WorkoutRecord[]> {
+  if (!isSupabaseConfigured()) return [];
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("workout_sessions")
+    .select("id, owner_id, scheduled_at, status, title, session_type, workout_exercises(id, position, name, workout_sets(id, completed_at))")
+    .gte("scheduled_at", `${start}T00:00:00`)
+    .lte("scheduled_at", `${end}T23:59:59`)
+    .order("scheduled_at");
+  if (error || !data) return [];
+  return data as WorkoutRecord[];
 }
 
 async function getPlans(start: string, end: string): Promise<WorkoutPlan[]> {
@@ -252,6 +301,34 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
   );
 }
 
+function WorkoutRecordCard({ record }: { record: WorkoutRecord }) {
+  const exercises = [...(record.workout_exercises || [])].sort((a, b) => a.position - b.position);
+  const totalSets = exercises.reduce((total, exercise) => total + (exercise.workout_sets?.length || 0), 0);
+  const completedSets = exercises.reduce(
+    (total, exercise) => total + (exercise.workout_sets || []).filter((set) => set.completed_at).length,
+    0,
+  );
+
+  return (
+    <article className="rounded-lg border border-border bg-card p-4">
+      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        <CalendarCheck aria-hidden="true" className="h-3.5 w-3.5" />
+        {recordStatusLabels[record.status] || record.status} · {record.scheduled_at.slice(11, 16)}
+      </p>
+      <h3 className="mt-1 text-xl font-semibold">{record.title}</h3>
+      <p className="mt-1 text-sm text-muted-foreground">{completedSets}/{totalSets} 組完成 · {exercises.length} 個動作</p>
+      {exercises.length ? (
+        <ol className="mt-3 flex flex-wrap gap-2">
+          {exercises.map((exercise, index) => (
+            <li className="rounded-full bg-muted px-3 py-1 text-xs" key={exercise.id}>{index + 1}. {exercise.name}</li>
+          ))}
+        </ol>
+      ) : null}
+      <Link className="mt-3 inline-flex min-h-11 items-center text-sm text-muted-foreground underline underline-offset-4" href="/workouts">查看與編輯紀錄</Link>
+    </article>
+  );
+}
+
 function ExerciseRow({ exercise, index }: { exercise: PlannedExercise; index: number }) {
   const sets = [...(exercise.planned_sets || [])].sort((a, b) => a.position - b.position);
   const first = sets[0];
@@ -297,4 +374,11 @@ function addDays(date: string, days: number) {
 
 function formatMonthDay(date: string) {
   return `${Number(date.slice(5, 7))}/${Number(date.slice(8, 10))}`;
+}
+
+function daySummary(planCount: number, recordCount: number) {
+  if (planCount && recordCount) return `${planCount} 個計畫 · ${recordCount} 筆紀錄`;
+  if (planCount) return `${planCount} 個計畫`;
+  if (recordCount) return `${recordCount} 筆訓練紀錄`;
+  return "尚未安排";
 }
