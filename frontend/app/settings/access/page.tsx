@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { CheckCircle2, Link2, ShieldCheck, UserPlus, X } from "lucide-react";
+import { CheckCircle2, Download, Link2, ShieldCheck, UserPlus, X } from "lucide-react";
 import {
   acceptCoachInvitation,
   createCoachInvitation,
@@ -47,6 +47,7 @@ export default async function AccessPage({ searchParams }: AccessPageProps) {
       <div className="mx-auto w-full max-w-md px-5 pt-[calc(24px+env(safe-area-inset-top))]">
         <p className="text-sm text-muted-foreground">設定</p>
         <h1 className="mt-1 text-3xl font-semibold">教練存取權</h1>
+        {isOwner ? <Link className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm text-muted-foreground underline underline-offset-4" href="/settings/export"><Download aria-hidden="true" className="h-4 w-4" />匯出與備份</Link> : null}
 
         {params?.error ? <p className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="alert">操作失敗：{params.error}</p> : null}
         {params?.invited ? <p aria-live="polite" className="mt-4 rounded-md bg-muted p-3 text-sm text-muted-foreground" role="status">邀請已建立。</p> : null}
