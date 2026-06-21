@@ -71,16 +71,18 @@
 - [x] Weight, set count, reps, duration, and intensity tracking.
 - [x] Session-level and exercise-level pain notes.
 - [x] Apply `supabase/migrations/005_workout_sessions.sql`.
-- [ ] Apply `supabase/migrations/006_workout_set_completion.sql`.
+- [x] Apply `supabase/migrations/006_workout_set_completion.sql`.
 - [x] Per-set inline editing/check flow.
 
 ## Sprint 5: Workout Planning
 
-- [ ] Workout plan, planned exercises, and planned sets schema.
-- [ ] Week navigator and iPhone day chips.
-- [ ] Four-step plan creation wizard.
-- [ ] Clone plan, clone previous week, reschedule, skip, and cancel.
-- [ ] Coach `manage_plans` permission.
+- [x] Workout plan, planned exercises, and planned sets schema.
+- [x] Apply `supabase/migrations/007_workout_plans.sql`.
+- [x] Week navigator and iPhone day chips.
+- [x] Four-step plan creation wizard.
+- [x] Clone plan, clone previous week, reschedule, skip, and cancel.
+- [x] Coach `manage_plans` permission.
+- [x] Apply `supabase/migrations/008_workout_plan_coach_permissions.sql`.
 
 ## Sprint 6: Check-Based Workout Execution
 
