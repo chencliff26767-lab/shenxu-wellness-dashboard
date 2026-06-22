@@ -92,9 +92,9 @@ export function WorkoutSetEditor({ action, set }: WorkoutSetEditorProps) {
       ref={formRef}
     >
       <input name="id" type="hidden" value={set.id} />
-      <div aria-label={`第 ${set.position} 組`} className={`flex items-end gap-1.5 ${completed ? "opacity-60" : ""}`} role="group">
-        <span className="flex h-11 w-7 shrink-0 items-center justify-center text-sm font-semibold">{set.position}</span>
-        <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-0.5">
+      <div aria-label={`第 ${set.position} 組`} className={`flex items-start gap-1 ${completed ? "opacity-60" : ""}`} role="group">
+        <span className="mt-[14px] flex h-11 w-7 shrink-0 items-center justify-center text-sm font-semibold">{set.position}</span>
+        <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto pb-0.5">
           <SetInput label="kg" name="actual_weight_kg" onChange={scheduleSave} planned={set.planned_weight_kg} value={set.actual_weight_kg} />
           <SetInput label="次" name="actual_reps" onChange={scheduleSave} planned={set.planned_reps} step="1" value={set.actual_reps} />
           {showMinutes ? <SetInput label="分鐘" name="actual_duration_min" onChange={scheduleSave} planned={set.planned_duration_min} step="1" value={set.actual_duration_min} /> : null}
@@ -104,12 +104,12 @@ export function WorkoutSetEditor({ action, set }: WorkoutSetEditorProps) {
           {!showIntensity ? <SetInput label="RPE" max="10" min="1" name="actual_rpe" onChange={scheduleSave} planned={set.planned_rpe} step="1" value={set.actual_rpe} /> : null}
           {set.planned_rir != null || set.actual_rir != null ? <SetInput label="RIR" max="10" name="actual_rir" onChange={scheduleSave} planned={set.planned_rir} step="1" value={set.actual_rir} /> : null}
         </div>
-        <button aria-label={`儲存第 ${set.position} 組`} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground disabled:opacity-40" disabled={pending} type="submit">
+        <button aria-label={`儲存第 ${set.position} 組`} className="mt-[14px] flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground disabled:opacity-40" disabled={pending} type="submit">
           <Save aria-hidden="true" className="h-4 w-4" />
         </button>
         <button
           aria-label={`第 ${set.position} 組${completed ? "取消完成" : "完成"}`}
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-md border transition-colors ${completed ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"}`}
+          className={`mt-[14px] flex h-11 w-11 shrink-0 items-center justify-center rounded-md border transition-colors ${completed ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"}`}
           disabled={pending}
           onClick={toggleCompleted}
           type="button"
@@ -140,7 +140,7 @@ export function WorkoutSetEditor({ action, set }: WorkoutSetEditorProps) {
 
 function SetInput({ label, max, min = "0", name, onChange, planned, step = "0.5", value }: { label: string; max?: string; min?: string; name: string; onChange: () => void; planned: number | string | null; step?: string; value: number | string | null }) {
   return (
-    <label className="w-14 shrink-0 text-center text-[10px] leading-none text-muted-foreground">
+    <label className="w-10 shrink-0 text-center text-[10px] leading-none text-muted-foreground sm:w-14">
       {label}
       <input aria-label={label} className="mt-1 h-11 w-full rounded-md border border-border bg-card px-1 text-center text-sm text-foreground outline-none focus:ring-2 focus:ring-primary" defaultValue={value ?? planned ?? ""} inputMode="decimal" max={max} min={min} name={name} onChange={onChange} placeholder="—" step={step} type="number" />
     </label>

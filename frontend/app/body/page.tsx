@@ -1,6 +1,7 @@
 import { Edit3, FileImage, Scale, Trash2 } from "lucide-react";
 import { createBodyMetric, deleteBodyMetric, updateBodyMetric } from "@/app/actions/body-metrics";
 import { BottomNav } from "@/components/bottom-nav";
+import { PhotoPicker } from "@/components/photo-picker";
 import { Button } from "@/components/ui/button";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -208,12 +209,10 @@ function MetricForm({
             InBody 報告 JPG
           </label>
           {metric?.inbody_report_path ? <p className="text-sm text-muted-foreground">已上傳報告；重新選檔會覆蓋。</p> : null}
-          <input
+          <PhotoPicker
             accept="image/jpeg"
-            className="min-h-11 w-full rounded-md border border-border bg-card px-3 py-2 text-base outline-none file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-2 file:text-sm focus:ring-2 focus:ring-primary"
             id={metric ? `inbody_report-${metric.id}` : "inbody_report"}
             name="inbody_report"
-            type="file"
           />
         </div>
       </details>

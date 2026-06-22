@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { PhotoPicker } from "@/components/photo-picker";
 import { Button } from "@/components/ui/button";
 
 const DISPLAY_TARGET_BYTES = 180 * 1024;
@@ -73,7 +74,7 @@ export function MealForm({ action, meal, submitLabel }: MealFormProps) {
 
       <label className="block text-sm font-medium" htmlFor={meal ? `photo-${meal.id}` : "photo"}>照片</label>
       {meal?.photo_path ? <p className="text-sm text-muted-foreground">已經有照片；重新選擇會覆蓋。</p> : null}
-      <input accept="image/*,.heic,.heif" className="min-h-11 w-full rounded-md border border-border bg-card px-3 py-2 text-base outline-none file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-2 file:text-sm focus:ring-2 focus:ring-primary" disabled={isCompressing} id={meal ? `photo-${meal.id}` : "photo"} name="photo" onChange={handlePhotoChange} ref={inputRef} type="file" />
+      <PhotoPicker accept="image/*,.heic,.heif" disabled={isCompressing} id={meal ? `photo-${meal.id}` : "photo"} inputRef={inputRef} name="photo" onChange={handlePhotoChange} />
       {photoMessage ? <p className="text-sm text-muted-foreground">{photoMessage}</p> : null}
 
       <Button className="w-full" disabled={isCompressing} type="submit">{isCompressing ? "壓縮照片中..." : submitLabel}</Button>
