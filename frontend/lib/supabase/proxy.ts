@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { isSupabaseConfigured, supabasePublishableKey, supabaseUrl } from "@/lib/supabase/env";
+import { isSupabaseConfigured, supabasePublishableKey, supabaseUrl } from "./env";
 
 const protectedRoutes = ["/today", "/settings", "/body", "/meals", "/workouts", "/plans", "/coach"];
 
