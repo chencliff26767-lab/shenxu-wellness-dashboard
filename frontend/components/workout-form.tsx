@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 
 type WorkoutSet = {
@@ -75,6 +76,23 @@ export function WorkoutForm({ action, session, submitLabel }: WorkoutFormProps) 
 
   function updateExercise(key: string, field: keyof ExerciseFormState, value: string) {
     setExercises((current) => current.map((exercise) => (exercise.key === key ? { ...exercise, [field]: value } : exercise)));
+  }
+
+  function updateExerciseType(key: string, value: string) {
+    const defaults = defaultsForType(value);
+    setExercises((current) =>
+      current.map((exercise) =>
+        exercise.key === key
+          ? {
+              ...exercise,
+              exercise_type: value,
+              set_count: defaults.setCount,
+              reps: defaults.reps,
+              duration_min: defaults.durationMin,
+            }
+          : exercise,
+      ),
+    );
   }
 
   return (
@@ -173,7 +191,7 @@ export function WorkoutForm({ action, session, submitLabel }: WorkoutFormProps) 
               className="mb-3 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
               id={`exercise_type-${exercise.key}`}
               name="exercise_type"
-              onChange={(event) => updateExercise(exercise.key, "exercise_type", event.target.value)}
+              onChange={(event) => updateExerciseType(exercise.key, event.target.value)}
               value={exercise.exercise_type}
             >
               {typeOptions.map(([value, label]) => (
@@ -262,10 +280,17 @@ export function WorkoutForm({ action, session, submitLabel }: WorkoutFormProps) 
         ))}
       </div>
 
-      <Button className="w-full" type="submit">
-        {submitLabel}
-      </Button>
+      <SubmitButton label={submitLabel} />
     </form>
+  );
+}
+
+function SubmitButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button className="w-full" disabled={pending} type="submit">
+      {pending ? "儲存中..." : label}
+    </Button>
   );
 }
 
@@ -285,7 +310,7 @@ function Field({
   type?: string;
 }) {
   return (
-    <label className="block text-sm font-medium">
+    <label className="block min-w-0 text-sm font-medium">
         {label}
       <input
         className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
@@ -319,7 +344,7 @@ function Input({
   value: string;
 }) {
   return (
-    <label className="block text-sm font-medium">
+    <label className="block min-w-0 text-sm font-medium">
         {label}
       <input
         className="mb-3 mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary"
@@ -360,18 +385,32 @@ function initialExercises(session?: WorkoutSession) {
 }
 
 function blankExercise(key = crypto.randomUUID()): ExerciseFormState {
+  const defaults = defaultsForType("strength");
   return {
     key,
     exercise_type: "strength",
     name: "",
-    set_count: "1",
+    set_count: defaults.setCount,
     weight_kg: "",
-    reps: "",
-    duration_min: "",
+    reps: defaults.reps,
+    duration_min: defaults.durationMin,
     intensity: "",
     exercise_note: "",
     exercise_pain_note: "",
   };
+}
+
+function defaultsForType(type: string) {
+  if (type === "strength") {
+    return { setCount: "4", reps: "12", durationMin: "" };
+  }
+  if (type === "pilates") {
+    return { setCount: "2", reps: "10", durationMin: "60" };
+  }
+  if (type === "cardio" || type === "running" || type === "tennis") {
+    return { setCount: "1", reps: "", durationMin: "30" };
+  }
+  return { setCount: "1", reps: "", durationMin: "" };
 }
 
 function nowLocal() {

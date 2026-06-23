@@ -7,8 +7,15 @@ import { WellnessMascot } from "@/components/wellness-mascot";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
+type TodayPlan = {
+  id: string;
+  scheduled_time: string | null;
+  title: string;
+};
+
 export default async function TodayPage() {
-  const userEmail = await getUserEmail();
+  const [userEmail, todayPlans] = await Promise.all([getUserEmail(), getTodayPlans()]);
+  const firstPlan = todayPlans[0];
 
   return (
     <main className="min-h-dvh pb-[calc(88px+env(safe-area-inset-bottom))]">
@@ -32,21 +39,21 @@ export default async function TodayPage() {
             今日預排訓練
           </div>
           <div className="relative z-10 max-w-[78%]">
-            <h2 className="text-2xl font-semibold">今天還沒有安排訓練</h2>
-            <p className="mt-3 leading-7 text-muted-foreground">先替未來的自己準備好，到了現場就不用再想。</p>
+            <h2 className="text-2xl font-semibold">
+              {todayPlans.length ? `今天有 ${todayPlans.length} 個訓練安排` : "今天還沒有安排訓練"}
+            </h2>
+            <p className="mt-3 leading-7 text-muted-foreground">
+              {firstPlan
+                ? `${firstPlan.scheduled_time?.slice(0, 5) || "時間未定"} · ${firstPlan.title}`
+                : "先替未來的自己準備好，到了現場就不用再想。"}
+            </p>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-2">
+          <div className="mt-5 grid grid-cols-1 gap-2">
             <Link
               className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-              href="/workouts"
+              href="/workouts?new=1"
             >
               記錄現在
-            </Link>
-            <Link
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border bg-card px-4 text-sm font-medium hover:bg-muted"
-              href="/workouts"
-            >
-              安排訓練
             </Link>
           </div>
         </section>
@@ -54,7 +61,7 @@ export default async function TodayPage() {
         <section className="mt-4 grid grid-cols-2 gap-3">
           <QuickCard href="/body" icon={<Plus className="h-5 w-5" />} label="身材紀錄" value="體重 / 腰圍 / InBody" />
           <QuickCard href="/meals" icon={<Plus className="h-5 w-5" />} label="飲食紀錄" value="餐點 / 照片 / 備註" />
-          <QuickCard href="/workouts" icon={<Dumbbell className="h-5 w-5" />} label="訓練紀錄" value="記錄現在 / 安排訓練" />
+          <QuickCard href="/workouts?new=1" icon={<Dumbbell className="h-5 w-5" />} label="訓練紀錄" value="記錄現在 / 查看紀錄" />
           <QuickCard icon={<MessageCircle className="h-5 w-5" />} label="登入帳號" value={userEmail} />
         </section>
       </div>
@@ -74,6 +81,27 @@ async function getUserEmail() {
   } = await supabase.auth.getUser();
 
   return user?.email || "尚未登入";
+}
+
+async function getTodayPlans(): Promise<TodayPlan[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const supabase = await createClient();
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Taipei" }).format(new Date());
+  const { data, error } = await supabase
+    .from("workout_plans")
+    .select("id, scheduled_time, title")
+    .eq("scheduled_date", today)
+    .in("status", ["planned", "in_progress"])
+    .order("scheduled_time", { ascending: true, nullsFirst: false });
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data as TodayPlan[];
 }
 
 function QuickCard({

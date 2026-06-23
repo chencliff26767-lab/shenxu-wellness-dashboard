@@ -36,6 +36,31 @@ input {
   font: inherit;
 }
 
+input,
+select,
+textarea {
+  max-width: 100%;
+  min-width: 0;
+}
+
+a[href],
+button:not(:disabled),
+summary {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease,
+    transform 120ms ease;
+}
+
+a[href]:active,
+button:not(:disabled):active,
+summary:active {
+  transform: scale(0.98);
+}
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,

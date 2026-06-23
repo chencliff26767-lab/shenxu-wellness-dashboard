@@ -79,6 +79,7 @@ type WorkoutsPageProps = {
     started?: string;
     session?: string;
     finished?: string;
+    new?: string;
   }>;
 };
 
@@ -128,7 +129,7 @@ export default async function WorkoutsPage({ searchParams }: WorkoutsPageProps) 
           )}
         </section>
 
-        <details className="mt-4 rounded-lg border border-border bg-card" open={Boolean(params?.error)}>
+        <details className="mt-4 rounded-lg border border-border bg-card" open={Boolean(params?.error || params?.new)}>
           <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 font-medium [&::-webkit-details-marker]:hidden">
             <span className="flex items-center gap-2">
               <Plus aria-hidden="true" className="h-4 w-4" />

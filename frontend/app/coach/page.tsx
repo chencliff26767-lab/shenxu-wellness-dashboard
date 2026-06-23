@@ -8,6 +8,7 @@ import {
 } from "@/app/actions/coach";
 import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
 type CoachPageProps = {
@@ -21,6 +22,11 @@ type Plan = { id: string; title: string; scheduled_date: string; status: string 
 
 export default async function CoachPage({ searchParams }: CoachPageProps) {
   const params = await searchParams;
+  if (!isSupabaseConfigured()) {
+    return <CoachUnavailable message="本機尚未設定 Supabase 連線，無法載入教練頁。" />;
+  }
+
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -103,6 +109,32 @@ export default async function CoachPage({ searchParams }: CoachPageProps) {
           {isCoach ? <form action={createCoachFeedback} className="mt-3 rounded-lg border border-border bg-card p-4"><input name="owner_id" type="hidden" value={ownerId} /><textarea className="min-h-24 w-full rounded-md border border-border bg-card p-3" name="body" placeholder="本週觀察與下一步建議…" required /><Button className="mt-2 w-full" type="submit">送出回饋</Button></form> : null}
           <div className="mt-3 space-y-2">{feedback.length ? feedback.map((item) => <article className="rounded-lg border border-border bg-card p-4" key={item.id}><p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString("zh-TW", { timeZone: "Asia/Taipei" })}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6">{item.body}</p></article>) : <p className="rounded-lg border border-dashed border-border bg-card p-4 text-sm text-muted-foreground">尚無教練回饋。</p>}</div>
         </section>
+      </div>
+      <BottomNav />
+    </main>
+  );
+  } catch {
+    return <CoachUnavailable message="目前無法連線到資料服務，請稍後重試或確認本機網路。" />;
+  }
+}
+
+function CoachUnavailable({ message }: { message: string }) {
+  return (
+    <main className="min-h-dvh pb-[calc(88px+env(safe-area-inset-bottom))]">
+      <div className="mx-auto w-full max-w-md px-5 pt-[calc(24px+env(safe-area-inset-top))]">
+        <div className="rounded-lg border border-border bg-card p-5">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <AlertTriangle aria-hidden="true" className="h-5 w-5" />
+            <p className="text-sm font-medium">教練頁暫時無法載入</p>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">{message}</p>
+          <Link
+            className="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-border bg-card px-4 text-sm font-medium"
+            href="/today"
+          >
+            回到今天
+          </Link>
+        </div>
       </div>
       <BottomNav />
     </main>

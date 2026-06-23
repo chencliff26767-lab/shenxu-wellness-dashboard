@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { ArrowLeft, ArrowRight, Check, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -63,6 +64,23 @@ export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanW
 
   function updatePlan(field: keyof PlanState, value: string) {
     setPlan((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateWorkoutType(value: string) {
+    const defaults = defaultsForType(value);
+    setPlan((current) => ({
+      ...current,
+      workoutType: value,
+      durationMinutes: defaults.durationMinutes || current.durationMinutes,
+    }));
+    setExercises((current) =>
+      current.map((exercise) => ({
+        ...exercise,
+        type: value,
+        setCount: defaults.setCount,
+        reps: defaults.reps,
+      })),
+    );
   }
 
   function updateExercise(key: string, field: keyof ExerciseState, value: string | boolean) {
@@ -129,7 +147,7 @@ export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanW
         ))}
       </ol>
 
-      {step === 0 ? <PlanBasics plan={plan} update={updatePlan} /> : null}
+      {step === 0 ? <PlanBasics plan={plan} update={updatePlan} updateWorkoutType={updateWorkoutType} /> : null}
       {step === 1 ? (
         <ExerciseList exercises={exercises} add={addExercise} remove={removeExercise} update={updateExercise} />
       ) : null}
@@ -147,19 +165,27 @@ export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanW
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </Button>
         ) : (
-          <Button type="submit">建立計畫</Button>
+          <SubmitButton />
         )}
       </div>
     </form>
   );
 }
 
-function PlanBasics({ plan, update }: { plan: PlanState; update: (field: keyof PlanState, value: string) => void }) {
+function PlanBasics({
+  plan,
+  update,
+  updateWorkoutType,
+}: {
+  plan: PlanState;
+  update: (field: keyof PlanState, value: string) => void;
+  updateWorkoutType: (value: string) => void;
+}) {
   return (
     <section className="space-y-3 rounded-lg border border-border bg-card p-4">
       <h2 className="text-lg font-semibold">何時要做什麼？</h2>
       <TextInput label="計畫名稱" onChange={(value) => update("title", value)} placeholder="例如 下肢力量" required value={plan.title} />
-      <SelectInput label="訓練類型" onChange={(value) => update("workoutType", value)} value={plan.workoutType} />
+      <SelectInput label="訓練類型" onChange={updateWorkoutType} value={plan.workoutType} />
       <div className="grid grid-cols-2 gap-2">
         <TextInput label="日期" onChange={(value) => update("scheduledDate", value)} required type="date" value={plan.scheduledDate} />
         <TextInput label="時間" onChange={(value) => update("scheduledTime", value)} type="time" value={plan.scheduledTime} />
@@ -168,6 +194,15 @@ function PlanBasics({ plan, update }: { plan: PlanState; update: (field: keyof P
       <TextArea label="本次重點" onChange={(value) => update("focus", value)} value={plan.focus} />
       <TextArea label="事前準備" onChange={(value) => update("preparation", value)} value={plan.preparation} />
     </section>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button disabled={pending} type="submit">
+      {pending ? "儲存中..." : "建立計畫"}
+    </Button>
   );
 }
 
@@ -276,7 +311,7 @@ function PlanReview({ exercises, plan }: { exercises: ExerciseState[]; plan: Pla
 
 function SelectInput({ label, onChange, value }: { label: string; onChange: (value: string) => void; value: string }) {
   return (
-    <label className="block text-sm font-medium">
+    <label className="block min-w-0 text-sm font-medium">
       {label}
       <select className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base" onChange={(event) => onChange(event.target.value)} value={value}>
         {typeOptions.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}
@@ -287,7 +322,7 @@ function SelectInput({ label, onChange, value }: { label: string; onChange: (val
 
 function TextInput({ label, max, min, onChange, placeholder, required, step, type = "text", value }: { label: string; max?: string; min?: string; onChange: (value: string) => void; placeholder?: string; required?: boolean; step?: string; type?: string; value: string }) {
   return (
-    <label className="block text-sm font-medium">
+    <label className="block min-w-0 text-sm font-medium">
       {label}
       <input className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-3 text-base outline-none focus:ring-2 focus:ring-primary" max={max} min={min} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} required={required} step={step} type={type} value={value} />
     </label>
@@ -304,6 +339,7 @@ function TextArea({ label, onChange, value }: { label: string; onChange: (value:
 }
 
 function blankExercise(type: string, key = crypto.randomUUID()): ExerciseState {
+  const defaults = defaultsForType(type);
   return {
     key,
     name: "",
@@ -311,9 +347,9 @@ function blankExercise(type: string, key = crypto.randomUUID()): ExerciseState {
     variation: "",
     equipment: "",
     required: true,
-    setCount: "3",
+    setCount: defaults.setCount,
     weight: "",
-    reps: "",
+    reps: defaults.reps,
     durationSeconds: "",
     distanceM: "",
     rpe: "",
@@ -321,4 +357,17 @@ function blankExercise(type: string, key = crypto.randomUUID()): ExerciseState {
     restSeconds: "",
     note: "",
   };
+}
+
+function defaultsForType(type: string) {
+  if (type === "strength") {
+    return { setCount: "4", reps: "12", durationMinutes: "" };
+  }
+  if (type === "pilates") {
+    return { setCount: "2", reps: "10", durationMinutes: "60" };
+  }
+  if (type === "cardio" || type === "running" || type === "tennis") {
+    return { setCount: "1", reps: "", durationMinutes: "30" };
+  }
+  return { setCount: "1", reps: "", durationMinutes: "" };
 }

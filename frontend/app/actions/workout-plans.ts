@@ -170,6 +170,42 @@ async function insertExercises(supabase: SupabaseClient, planId: string, exercis
   }
 }
 
+async function findActiveDuplicatePlan(
+  supabase: SupabaseClient,
+  {
+    excludeId,
+    ownerId,
+    scheduledDate,
+    scheduledTime,
+    title,
+    workoutType,
+  }: {
+    excludeId?: string;
+    ownerId: string;
+    scheduledDate: string;
+    scheduledTime: string | null;
+    title: string;
+    workoutType: string;
+  },
+) {
+  let query = supabase
+    .from("workout_plans")
+    .select("id")
+    .eq("owner_id", ownerId)
+    .eq("scheduled_date", scheduledDate)
+    .eq("title", title)
+    .eq("workout_type", workoutType)
+    .in("status", ["planned", "in_progress"])
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  query = scheduledTime ? query.eq("scheduled_time", scheduledTime) : query.is("scheduled_time", null);
+  if (excludeId) query = query.neq("id", excludeId);
+
+  const { data } = await query.maybeSingle();
+  return data?.id || null;
+}
+
 export async function createWorkoutPlan(formData: FormData) {
   const { supabase, user } = await requireUser();
   const title = text(formData.get("title"));
@@ -182,6 +218,20 @@ export async function createWorkoutPlan(formData: FormData) {
   }
 
   const ownerId = text(formData.get("owner_id")) || user.id;
+  const scheduledTime = text(formData.get("scheduled_time"));
+  const duplicateId = await findActiveDuplicatePlan(supabase, {
+    ownerId,
+    scheduledDate,
+    scheduledTime,
+    title,
+    workoutType,
+  });
+  if (duplicateId) {
+    revalidatePath("/plans");
+    revalidatePath("/today");
+    redirect(`/plans?day=${scheduledDate}&saved=1`);
+  }
+
   const { data, error } = await supabase
     .from("workout_plans")
     .insert({
@@ -190,7 +240,7 @@ export async function createWorkoutPlan(formData: FormData) {
       title,
       workout_type: workoutType,
       scheduled_date: scheduledDate,
-      scheduled_time: text(formData.get("scheduled_time")),
+      scheduled_time: scheduledTime,
       target_duration_minutes: integer(formData.get("target_duration_minutes")),
       focus_text: text(formData.get("focus_text")),
       preparation_notes: text(formData.get("preparation_notes")),
@@ -199,6 +249,21 @@ export async function createWorkoutPlan(formData: FormData) {
     .single();
 
   if (error || !data) redirect(`/plans/new?error=${encodeURIComponent(error?.message || "insert-failed")}`);
+
+  const concurrentDuplicateId = await findActiveDuplicatePlan(supabase, {
+    excludeId: data.id,
+    ownerId,
+    scheduledDate,
+    scheduledTime,
+    title,
+    workoutType,
+  });
+  if (concurrentDuplicateId) {
+    await supabase.from("workout_plans").delete().eq("id", data.id);
+    revalidatePath("/plans");
+    revalidatePath("/today");
+    redirect(`/plans?day=${scheduledDate}&saved=1`);
+  }
 
   try {
     // ponytail: child inserts are compensated by deleting the parent — ceiling: not a true transaction — upgrade: create_plan RPC.
@@ -209,6 +274,7 @@ export async function createWorkoutPlan(formData: FormData) {
   }
 
   revalidatePath("/plans");
+  revalidatePath("/today");
   redirect(`/plans?day=${scheduledDate}&saved=1`);
 }
 
@@ -224,6 +290,15 @@ async function getPlan(supabase: SupabaseClient, id: string): Promise<PlanWithEx
 }
 
 async function clonePlanToDate(supabase: SupabaseClient, userId: string, source: PlanWithExercises, targetDate: string) {
+  const duplicateId = await findActiveDuplicatePlan(supabase, {
+    ownerId: source.owner_id,
+    scheduledDate: targetDate,
+    scheduledTime: source.scheduled_time,
+    title: source.title,
+    workoutType: source.workout_type,
+  });
+  if (duplicateId) return;
+
   const { data, error } = await supabase
     .from("workout_plans")
     .insert({
@@ -299,6 +374,7 @@ export async function cloneWorkoutPlan(formData: FormData) {
     redirect(`/plans?error=${encodeURIComponent(caught instanceof Error ? caught.message : "clone-failed")}`);
   }
   revalidatePath("/plans");
+  revalidatePath("/today");
   redirect(`/plans?day=${targetDate}&cloned=1`);
 }
 
@@ -330,6 +406,7 @@ export async function clonePreviousWeek(formData: FormData) {
     if (!count) await clonePlanToDate(supabase, user.id, source, targetDate);
   }
   revalidatePath("/plans");
+  revalidatePath("/today");
   redirect(`/plans?week=${weekStart}&cloned=1`);
 }
 
@@ -351,6 +428,7 @@ export async function rescheduleWorkoutPlan(formData: FormData) {
     .eq("id", id);
   if (error) redirect(`/plans?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/plans");
+  revalidatePath("/today");
   redirect(`/plans?day=${scheduledDate}&updated=1`);
 }
 
@@ -370,6 +448,7 @@ export async function updateWorkoutPlanStatus(formData: FormData) {
     .eq("id", id);
   if (error) redirect(`/plans?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/plans");
+  revalidatePath("/today");
   redirect(`/plans?updated=1${returnDate ? `&day=${returnDate}` : ""}`);
 }
 
@@ -385,6 +464,7 @@ export async function startWorkoutPlan(formData: FormData) {
 
   revalidatePath("/plans");
   revalidatePath("/workouts");
+  revalidatePath("/today");
   redirect(`/workouts?session=${data}&started=1`);
 }
 

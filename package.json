@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix frontend run dev",
+    "dev:unsafe-tls": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$env:NODE_TLS_REJECT_UNAUTHORIZED='0'; npm --prefix frontend run dev\"",
     "build": "npm --prefix frontend run build",
     "lint": "npm --prefix frontend run lint",
     "typecheck": "npm --prefix frontend run typecheck"

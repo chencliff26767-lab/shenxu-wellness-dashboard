@@ -146,6 +146,7 @@ export async function createWorkout(formData: FormData) {
 
   await replaceExercises(data.id, payload.status, formData);
   revalidatePath("/workouts");
+  revalidatePath("/today");
   redirect("/workouts?saved=1");
 }
 
@@ -178,6 +179,7 @@ export async function updateWorkout(formData: FormData) {
 
   await replaceExercises(id, payload.status, formData);
   revalidatePath("/workouts");
+  revalidatePath("/today");
   redirect("/workouts?updated=1");
 }
 
@@ -200,6 +202,7 @@ export async function deleteWorkout(formData: FormData) {
   }
 
   revalidatePath("/workouts");
+  revalidatePath("/today");
 }
 
 export async function updateWorkoutSet(formData: FormData) {
@@ -256,6 +259,7 @@ export async function updateWorkoutSet(formData: FormData) {
 
   revalidatePath("/workouts");
   revalidatePath("/plans");
+  revalidatePath("/today");
 }
 
 export async function updateWorkoutExerciseNotes(formData: FormData) {
@@ -273,6 +277,7 @@ export async function updateWorkoutExerciseNotes(formData: FormData) {
     .eq("id", id);
   if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/workouts");
+  revalidatePath("/today");
 }
 
 export async function updateWorkoutSessionSummary(formData: FormData) {
@@ -298,6 +303,7 @@ export async function updateWorkoutSessionSummary(formData: FormData) {
     .eq("id", id);
   if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/workouts");
+  revalidatePath("/today");
   redirect(`/workouts?session=${id}&updated=1`);
 }
 
@@ -318,6 +324,7 @@ export async function updateWorkoutSessionState(formData: FormData) {
   if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/workouts");
   revalidatePath("/plans");
+  revalidatePath("/today");
 }
 
 export async function finishWorkoutSession(formData: FormData) {
@@ -328,5 +335,6 @@ export async function finishWorkoutSession(formData: FormData) {
   if (error) redirect(`/workouts?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/workouts");
   revalidatePath("/plans");
+  revalidatePath("/today");
   redirect(`/workouts?session=${id}&finished=1`);
 }
