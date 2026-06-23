@@ -468,6 +468,169 @@ export async function startWorkoutPlan(formData: FormData) {
   redirect(`/workouts?session=${data}&started=1`);
 }
 
+async function getOrStartWorkoutSession(supabase: SupabaseClient, planId: string) {
+  const { data: existing } = await supabase
+    .from("workout_sessions")
+    .select("id")
+    .eq("workout_plan_id", planId)
+    .maybeSingle();
+
+  if (existing?.id) {
+    return existing.id;
+  }
+
+  const { data, error } = await supabase.rpc("start_workout_plan", { target_plan_id: planId });
+  if (error || !data) {
+    throw new Error(error?.message || "start-workout-failed");
+  }
+
+  return data as string;
+}
+
+async function workoutSetIds(supabase: SupabaseClient, sessionId: string) {
+  const { data: exercises, error } = await supabase
+    .from("workout_exercises")
+    .select("id")
+    .eq("session_id", sessionId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const exerciseIds = (exercises || []).map((exercise) => exercise.id);
+  if (!exerciseIds.length) {
+    return [];
+  }
+
+  const { data: sets, error: setError } = await supabase
+    .from("workout_sets")
+    .select("id, completed_at")
+    .in("exercise_id", exerciseIds);
+
+  if (setError) {
+    throw new Error(setError.message);
+  }
+
+  return sets || [];
+}
+
+async function syncPlanProgress(supabase: SupabaseClient, sessionId: string, planId: string) {
+  const sets = await workoutSetIds(supabase, sessionId);
+  const completedSets = sets.filter((set) => set.completed_at).length;
+  const now = new Date().toISOString();
+  const status = sets.length > 0 && completedSets === sets.length ? "completed" : completedSets > 0 ? "partial" : "in_progress";
+  const completedAt = status === "completed" ? now : null;
+
+  const { error: sessionError } = await supabase
+    .from("workout_sessions")
+    .update({
+      status,
+      completed_at: completedAt,
+      paused_at: null,
+      updated_at: now,
+    })
+    .eq("id", sessionId);
+
+  if (sessionError) {
+    throw new Error(sessionError.message);
+  }
+
+  const { error: planError } = await supabase
+    .from("workout_plans")
+    .update({
+      status,
+      completed_at: completedAt,
+      updated_at: now,
+    })
+    .eq("id", planId);
+
+  if (planError) {
+    throw new Error(planError.message);
+  }
+}
+
+export async function quickCompleteWorkoutPlan(formData: FormData) {
+  const { supabase } = await requireUser();
+  const planId = text(formData.get("id"));
+  if (!planId) redirect("/today?error=missing-plan-id");
+  const overallRpe = integer(formData.get("overall_rpe"));
+  const painScore = integer(formData.get("pain_score"));
+  if ((overallRpe != null && (overallRpe < 1 || overallRpe > 10)) || (painScore != null && painScore > 10)) {
+    redirect("/today?error=invalid-feedback");
+  }
+
+  try {
+    const sessionId = await getOrStartWorkoutSession(supabase, planId);
+    const sets = await workoutSetIds(supabase, sessionId);
+    const now = new Date().toISOString();
+    if (sets.length) {
+      const { error: setError } = await supabase
+        .from("workout_sets")
+        .update({ completed_at: now })
+        .in("id", sets.map((set) => set.id));
+      if (setError) throw new Error(setError.message);
+    }
+
+    const { error: summaryError } = await supabase
+      .from("workout_sessions")
+      .update({
+        overall_rpe: overallRpe,
+        pain_score: painScore,
+        note: text(formData.get("note")),
+        pain_note: text(formData.get("pain_note")),
+        updated_at: now,
+      })
+      .eq("id", sessionId);
+    if (summaryError) throw new Error(summaryError.message);
+
+    await syncPlanProgress(supabase, sessionId, planId);
+  } catch (caught) {
+    redirect(`/today?error=${encodeURIComponent(caught instanceof Error ? caught.message : "quick-complete-failed")}`);
+  }
+
+  revalidatePath("/today");
+  revalidatePath("/plans");
+  revalidatePath("/workouts");
+}
+
+export async function quickToggleWorkoutSet(formData: FormData) {
+  const { supabase } = await requireUser();
+  const planId = text(formData.get("plan_id"));
+  const setId = text(formData.get("set_id"));
+  const plannedSetId = text(formData.get("planned_set_id"));
+  const completed = String(formData.get("completed")) === "true";
+  if (!planId || (!setId && !plannedSetId)) redirect("/today?error=missing-set-id");
+
+  try {
+    const sessionId = await getOrStartWorkoutSession(supabase, planId);
+    let targetSetId = setId;
+
+    if (!targetSetId && plannedSetId) {
+      const { data, error } = await supabase
+        .from("workout_sets")
+        .select("id")
+        .eq("planned_set_id", plannedSetId)
+        .single();
+      if (error || !data) throw new Error(error?.message || "set-not-found");
+      targetSetId = data.id;
+    }
+
+    const { error } = await supabase
+      .from("workout_sets")
+      .update({ completed_at: completed ? new Date().toISOString() : null })
+      .eq("id", targetSetId);
+    if (error) throw new Error(error.message);
+
+    await syncPlanProgress(supabase, sessionId, planId);
+  } catch (caught) {
+    redirect(`/today?error=${encodeURIComponent(caught instanceof Error ? caught.message : "toggle-set-failed")}`);
+  }
+
+  revalidatePath("/today");
+  revalidatePath("/plans");
+  revalidatePath("/workouts");
+}
+
 function addDays(date: string, days: number) {
   const value = new Date(`${date}T12:00:00Z`);
   value.setUTCDate(value.getUTCDate() + days);
