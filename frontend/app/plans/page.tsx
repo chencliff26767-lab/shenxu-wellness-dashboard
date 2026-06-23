@@ -239,6 +239,7 @@ async function getPlans(start: string, end: string): Promise<WorkoutPlan[]> {
     .select("id, owner_id, title, workout_type, scheduled_date, scheduled_time, target_duration_minutes, status, focus_text, preparation_notes, skipped_reason, reschedule_count, locked_at, workout_sessions(id, status, scheduled_at), planned_exercises(id, position, name, variation, is_required, planned_sets(id, position, target_weight_kg, target_reps, target_duration_seconds, target_distance_m, target_rpe, target_rir, rest_seconds))")
     .gte("scheduled_date", start)
     .lte("scheduled_date", end)
+    .neq("status", "cancelled")
     .order("scheduled_date")
     .order("scheduled_time");
   if (error || !data) return [];

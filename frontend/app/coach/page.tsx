@@ -7,6 +7,12 @@ import {
   updateWeeklyGoalStatus,
 } from "@/app/actions/coach";
 import { BottomNav } from "@/components/bottom-nav";
+import {
+  HealthAnalytics,
+  type AnalyticsBodyMetric,
+  type AnalyticsPlan,
+  type AnalyticsWorkoutSession,
+} from "@/components/health-analytics";
 import { Button } from "@/components/ui/button";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -17,8 +23,8 @@ type CoachPageProps = {
 
 type Goal = { id: string; title: string; note: string | null; status: string; week_start: string };
 type Feedback = { id: string; body: string; created_at: string };
-type Workout = { id: string; title: string; scheduled_at: string; status: string; pain_score: number | null; pain_note: string | null; overall_rpe: number | null };
-type Plan = { id: string; title: string; scheduled_date: string; status: string };
+type Workout = AnalyticsWorkoutSession & { title: string; pain_note: string | null };
+type Plan = AnalyticsPlan & { title: string };
 
 export default async function CoachPage({ searchParams }: CoachPageProps) {
   const params = await searchParams;
@@ -41,20 +47,24 @@ export default async function CoachPage({ searchParams }: CoachPageProps) {
   const today = taipeiToday();
   const weekStart = startOfWeek(today);
   const weekEnd = addDays(weekStart, 6);
+  const analyticsStart = addDays(weekStart, -49);
 
   const [bodyResult, mealResult, workoutResult, planResult, feedbackResult, goalResult] = await Promise.all([
-    supabase.from("body_metrics").select("measured_on, weight_kg, waist_cm").eq("owner_id", ownerId).order("measured_on", { ascending: false }).limit(1),
+    supabase.from("body_metrics").select("measured_on, weight_kg, waist_cm, body_fat_percent, skeletal_muscle_mass_kg").eq("owner_id", ownerId).order("measured_on", { ascending: false }).limit(16),
     supabase.from("meal_entries").select("id").eq("owner_id", ownerId).gte("eaten_on", weekStart).lte("eaten_on", weekEnd),
-    supabase.from("workout_sessions").select("id, title, scheduled_at, status, pain_score, pain_note, overall_rpe").eq("owner_id", ownerId).gte("scheduled_at", `${weekStart}T00:00:00`).lte("scheduled_at", `${weekEnd}T23:59:59`).order("scheduled_at", { ascending: false }),
-    supabase.from("workout_plans").select("id, title, scheduled_date, status").eq("owner_id", ownerId).gte("scheduled_date", weekStart).lte("scheduled_date", weekEnd).order("scheduled_date"),
+    supabase.from("workout_sessions").select("id, title, scheduled_at, status, session_type, pain_score, pain_note, overall_rpe, duration_minutes, workout_exercises(exercise_type, workout_sets(planned_weight_kg, actual_weight_kg, planned_reps, actual_reps, planned_duration_min, actual_duration_min, planned_distance_m, actual_distance_m, completed_at))").eq("owner_id", ownerId).gte("scheduled_at", `${analyticsStart}T00:00:00`).lte("scheduled_at", `${weekEnd}T23:59:59`).order("scheduled_at", { ascending: false }),
+    supabase.from("workout_plans").select("id, title, scheduled_date, status").eq("owner_id", ownerId).gte("scheduled_date", analyticsStart).lte("scheduled_date", weekEnd).neq("status", "cancelled").order("scheduled_date"),
     supabase.from("coach_feedback").select("id, body, created_at").eq("owner_id", ownerId).order("created_at", { ascending: false }).limit(10),
     supabase.from("weekly_goals").select("id, title, note, status, week_start").eq("owner_id", ownerId).eq("week_start", weekStart).order("created_at"),
   ]);
 
-  const latestBody = bodyResult.data?.[0];
+  const bodyMetrics = (bodyResult.data || []) as AnalyticsBodyMetric[];
+  const allWorkouts = (workoutResult.data || []) as Workout[];
+  const allPlans = (planResult.data || []) as Plan[];
+  const latestBody = bodyMetrics[0];
   const meals = mealResult.data || [];
-  const workouts = (workoutResult.data || []) as Workout[];
-  const plans = (planResult.data || []) as Plan[];
+  const workouts = allWorkouts.filter((workout) => workout.scheduled_at.slice(0, 10) >= weekStart && workout.scheduled_at.slice(0, 10) <= weekEnd);
+  const plans = allPlans.filter((plan) => plan.scheduled_date >= weekStart && plan.scheduled_date <= weekEnd);
   const feedback = (feedbackResult.data || []) as Feedback[];
   const goals = (goalResult.data || []) as Goal[];
   const duePlans = plans.filter((plan) => plan.scheduled_date <= today && plan.status !== "cancelled");
@@ -84,6 +94,14 @@ export default async function CoachPage({ searchParams }: CoachPageProps) {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">完成率只計算本週已到期且未取消的計畫。</p>
         </section>
+
+        <HealthAnalytics
+          bodyMetrics={bodyMetrics}
+          plans={allPlans}
+          today={today}
+          weekStart={weekStart}
+          workouts={allWorkouts}
+        />
 
         <section className="mt-6">
           <div className="flex items-center gap-2"><Target aria-hidden="true" className="h-5 w-5 text-primary" /><h2 className="text-xl font-semibold">每週目標</h2></div>

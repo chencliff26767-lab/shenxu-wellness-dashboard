@@ -186,7 +186,7 @@ function PlanBasics({
       <h2 className="text-lg font-semibold">何時要做什麼？</h2>
       <TextInput label="計畫名稱" onChange={(value) => update("title", value)} placeholder="例如 下肢力量" required value={plan.title} />
       <SelectInput label="訓練類型" onChange={updateWorkoutType} value={plan.workoutType} />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <TextInput label="日期" onChange={(value) => update("scheduledDate", value)} required type="date" value={plan.scheduledDate} />
         <TextInput label="時間" onChange={(value) => update("scheduledTime", value)} type="time" value={plan.scheduledTime} />
       </div>

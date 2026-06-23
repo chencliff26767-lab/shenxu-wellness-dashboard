@@ -27,6 +27,60 @@ http://localhost:3000
 
 The root npm scripts delegate to the Next.js app in `frontend/`.
 
+## Git Account Switching On This Laptop
+
+This laptop may use more than one GitHub account. Set Git identity per repository so commits from this project do not inherit the wrong global user.
+
+1. Check the current repository settings:
+
+```powershell
+git remote -v
+git config --local user.name
+git config --local user.email
+```
+
+2. Set this repository to Cliff's GitHub identity:
+
+```powershell
+git config user.name "Cliffalaise.07"
+git config user.email "chencliff26767@gmail.com"
+```
+
+3. Point `origin` to the correct GitHub repository. Use `set-url` if `origin` already exists:
+
+```powershell
+git remote set-url origin git@github.com:chencliff26767-lab/shenxu-wellness-dashboard.git
+```
+
+If `origin` does not exist yet:
+
+```powershell
+git remote add origin git@github.com:chencliff26767-lab/shenxu-wellness-dashboard.git
+```
+
+4. If this machine uses an SSH host alias for this account, use the alias in the remote URL:
+
+```powershell
+git remote set-url origin git@github.com-chencliff26767-lab:chencliff26767-lab/shenxu-wellness-dashboard.git
+```
+
+5. Test which SSH identity GitHub accepts:
+
+```powershell
+ssh -T git@github.com
+ssh -T git@github.com-chencliff26767-lab
+```
+
+6. Confirm before pushing:
+
+```powershell
+git remote -v
+git config --local --list
+git status
+```
+
+Only use `--global` when changing the default identity for every repository on the laptop. For this project, prefer local config.
+
 ## Local Demo Mode
 
 If Supabase env is empty, the login page shows a local demo button. This is only for UI testing. It does not save records.
