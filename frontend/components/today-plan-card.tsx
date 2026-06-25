@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, Circle, Clock3 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { quickToggleWorkoutSet, updateWorkoutPlanFeedback } from "@/app/actions/workout-plans";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function TodayPlanCard({ plan }: TodayPlanCardProps) {
+  const router = useRouter();
   const [exercises, setExercises] = useState(plan.exercises);
   const [, startTransition] = useTransition();
 
@@ -98,6 +100,7 @@ export function TodayPlanCard({ plan }: TodayPlanCardProps) {
     formData.set("completed", String(nextCompleted));
     startTransition(async () => {
       await quickToggleWorkoutSet(formData);
+      router.refresh();
     });
   }
 

@@ -95,7 +95,7 @@ export default async function TodayPage() {
             {todayPlans.length ? (
               <ul className="mt-3 space-y-1.5 text-muted-foreground">
                 {todayPlans.map((plan) => (
-                  <li className={plan.status === "completed" ? "text-muted-foreground/70 line-through" : ""} key={plan.id}>
+                  <li className={isPlanCompleted(plan) ? "text-muted-foreground/70 line-through" : ""} key={plan.id}>
                     {plan.scheduled_time?.slice(0, 5) || "時間未定"} · {plan.title}
                   </li>
                 ))}
@@ -218,6 +218,11 @@ function mergeExercises(plan: TodayPlan, session: WorkoutSession | null) {
         totalSets: sets.length,
       };
     });
+}
+
+function isPlanCompleted(plan: TodayPlan) {
+  const sets = mergeExercises(plan, plan.workout_sessions?.[0] || null).flatMap((exercise) => exercise.sets);
+  return sets.length > 0 ? sets.every((set) => set.completed) : plan.status === "completed";
 }
 
 function setSummary(plannedSet: PlannedSet, actualSet?: WorkoutSet) {

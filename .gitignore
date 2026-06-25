@@ -16,6 +16,8 @@ frontend/.next/
 frontend/out/
 frontend/.env.local
 
+supabase/.temp/
+
 __pycache__/
 *.py[cod]
 .run.*.log

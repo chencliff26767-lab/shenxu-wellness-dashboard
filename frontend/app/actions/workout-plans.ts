@@ -594,7 +594,7 @@ export async function quickToggleWorkoutSet(formData: FormData) {
   if (!planId || (!setId && !plannedSetId)) redirect("/today?error=missing-set-id");
 
   try {
-    const sessionId = await getOrStartWorkoutSession(supabase, planId);
+    await getOrStartWorkoutSession(supabase, planId);
     let targetSetId = setId;
 
     if (!targetSetId && plannedSetId) {
@@ -613,7 +613,8 @@ export async function quickToggleWorkoutSet(formData: FormData) {
       .eq("id", targetSetId);
     if (error) throw new Error(error.message);
 
-    await syncPlanProgress(supabase, sessionId, planId);
+    const { error: syncError } = await supabase.rpc("sync_workout_progress", { target_set_id: targetSetId });
+    if (syncError) throw new Error(syncError.message);
   } catch (caught) {
     redirect(`/today?error=${encodeURIComponent(caught instanceof Error ? caught.message : "toggle-set-failed")}`);
   }

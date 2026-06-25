@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Play, Plus } from "lucide-react";
+import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Plus } from "lucide-react";
 import {
   clonePreviousWeek,
   cloneWorkoutPlan,
   rescheduleWorkoutPlan,
-  startWorkoutPlan,
   updateWorkoutPlanStatus,
 } from "@/app/actions/workout-plans";
 import { BottomNav } from "@/components/bottom-nav";
@@ -250,7 +249,6 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
   const exercises = [...(plan.planned_exercises || [])].sort((a, b) => a.position - b.position);
   const setCount = exercises.reduce((total, exercise) => total + (exercise.planned_sets?.length || 0), 0);
   const editable = plan.status === "planned" && !plan.locked_at;
-  const session = plan.workout_sessions?.[0];
 
   return (
     <article className="rounded-lg border border-border bg-card p-4">
@@ -273,21 +271,6 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
       <ol className="mt-3 space-y-2">
         {exercises.map((exercise, index) => <ExerciseRow exercise={exercise} index={index} key={exercise.id} />)}
       </ol>
-
-      {editable ? (
-        <form action={startWorkoutPlan} className="mt-3">
-          <input name="id" type="hidden" value={plan.id} />
-          <Button className="w-full" type="submit">
-            <Play aria-hidden="true" className="h-4 w-4" />
-            開始訓練
-          </Button>
-        </form>
-      ) : session && plan.status === "in_progress" ? (
-        <Link className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground" href={`/workouts?session=${session.id}`}>
-          <Play aria-hidden="true" className="h-4 w-4" />
-          繼續訓練
-        </Link>
-      ) : null}
 
       {editable ? (
         <details className="mt-3 rounded-md border border-border">
