@@ -549,7 +549,7 @@ async function syncPlanProgress(supabase: SupabaseClient, sessionId: string, pla
   }
 }
 
-export async function quickCompleteWorkoutPlan(formData: FormData) {
+export async function updateWorkoutPlanFeedback(formData: FormData) {
   const { supabase } = await requireUser();
   const planId = text(formData.get("id"));
   if (!planId) redirect("/today?error=missing-plan-id");
@@ -561,15 +561,7 @@ export async function quickCompleteWorkoutPlan(formData: FormData) {
 
   try {
     const sessionId = await getOrStartWorkoutSession(supabase, planId);
-    const sets = await workoutSetIds(supabase, sessionId);
     const now = new Date().toISOString();
-    if (sets.length) {
-      const { error: setError } = await supabase
-        .from("workout_sets")
-        .update({ completed_at: now })
-        .in("id", sets.map((set) => set.id));
-      if (setError) throw new Error(setError.message);
-    }
 
     const { error: summaryError } = await supabase
       .from("workout_sessions")
@@ -585,7 +577,7 @@ export async function quickCompleteWorkoutPlan(formData: FormData) {
 
     await syncPlanProgress(supabase, sessionId, planId);
   } catch (caught) {
-    redirect(`/today?error=${encodeURIComponent(caught instanceof Error ? caught.message : "quick-complete-failed")}`);
+    redirect(`/today?error=${encodeURIComponent(caught instanceof Error ? caught.message : "feedback-update-failed")}`);
   }
 
   revalidatePath("/today");
