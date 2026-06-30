@@ -33,10 +33,21 @@ type PlanState = {
   preparation: string;
 };
 
+export type WorkoutPlanWizardInitialPlan = Partial<PlanState>;
+
+export type WorkoutPlanWizardInitialExercise = Omit<ExerciseState, "key"> & {
+  key?: string;
+};
+
 type WorkoutPlanWizardProps = {
   action: (formData: FormData) => void | Promise<void>;
   initialDate: string;
+  initialExercises?: WorkoutPlanWizardInitialExercise[];
+  initialPlan?: WorkoutPlanWizardInitialPlan;
   ownerId: string;
+  planId?: string;
+  pendingLabel?: string;
+  submitLabel?: string;
 };
 
 const steps = ["基本資料", "訓練動作", "目標設定", "確認計畫"];
@@ -49,18 +60,34 @@ const typeOptions = [
   ["other", "其他"],
 ];
 
-export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanWizardProps) {
+export function WorkoutPlanWizard({
+  action,
+  initialDate,
+  initialExercises,
+  initialPlan,
+  ownerId,
+  pendingLabel = "儲存中...",
+  planId,
+  submitLabel = "建立計畫",
+}: WorkoutPlanWizardProps) {
   const [step, setStep] = useState(0);
-  const [plan, setPlan] = useState<PlanState>({
-    title: "",
-    workoutType: "strength",
-    scheduledDate: initialDate,
-    scheduledTime: "",
-    durationMinutes: "",
-    focus: "",
-    preparation: "",
-  });
-  const [exercises, setExercises] = useState<ExerciseState[]>([blankExercise("strength", "exercise-1")]);
+  const [plan, setPlan] = useState<PlanState>(() => ({
+    title: initialPlan?.title ?? "",
+    workoutType: initialPlan?.workoutType ?? "strength",
+    scheduledDate: initialPlan?.scheduledDate ?? initialDate,
+    scheduledTime: initialPlan?.scheduledTime ?? "",
+    durationMinutes: initialPlan?.durationMinutes ?? "",
+    focus: initialPlan?.focus ?? "",
+    preparation: initialPlan?.preparation ?? "",
+  }));
+  const [exercises, setExercises] = useState<ExerciseState[]>(() =>
+    initialExercises?.length
+      ? initialExercises.map((exercise, index) => ({
+          ...exercise,
+          key: exercise.key || `exercise-${index + 1}`,
+        }))
+      : [blankExercise(initialPlan?.workoutType ?? "strength", "exercise-1")],
+  );
 
   function updatePlan(field: keyof PlanState, value: string) {
     setPlan((current) => ({ ...current, [field]: value }));
@@ -104,6 +131,7 @@ export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanW
 
   return (
     <form action={action} className="space-y-5">
+      {planId ? <input name="id" type="hidden" value={planId} /> : null}
       <input name="owner_id" type="hidden" value={ownerId} />
       <input name="title" type="hidden" value={plan.title} />
       <input name="workout_type" type="hidden" value={plan.workoutType} />
@@ -165,7 +193,7 @@ export function WorkoutPlanWizard({ action, initialDate, ownerId }: WorkoutPlanW
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </Button>
         ) : (
-          <SubmitButton />
+          <SubmitButton pendingLabel={pendingLabel} submitLabel={submitLabel} />
         )}
       </div>
     </form>
@@ -197,11 +225,11 @@ function PlanBasics({
   );
 }
 
-function SubmitButton() {
+function SubmitButton({ pendingLabel, submitLabel }: { pendingLabel: string; submitLabel: string }) {
   const { pending } = useFormStatus();
   return (
     <Button disabled={pending} type="submit">
-      {pending ? "儲存中..." : "建立計畫"}
+      {pending ? pendingLabel : submitLabel}
     </Button>
   );
 }

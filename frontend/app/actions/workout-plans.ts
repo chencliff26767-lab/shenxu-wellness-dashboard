@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const WORKOUT_TYPES = new Set(["strength", "cardio", "running", "tennis", "pilates", "other"]);
-const PLAN_STATUSES = new Set(["skipped", "cancelled"]);
+const PLAN_STATUSES = new Set(["cancelled"]);
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -28,6 +28,23 @@ type PlanExerciseInput = {
   setCount: number;
   note: string | null;
   set: PlanSetInput;
+};
+
+type PlanExercisePayload = {
+  name: string;
+  type: string;
+  variation: string | null;
+  equipment: string | null;
+  required: boolean;
+  setCount: number;
+  note: string | null;
+  weight: number | null;
+  reps: number | null;
+  durationSeconds: number | null;
+  distanceM: number | null;
+  rpe: number | null;
+  rir: number | null;
+  restSeconds: number | null;
 };
 
 type PlanWithExercises = {
@@ -124,6 +141,25 @@ function exerciseInputs(formData: FormData): PlanExerciseInput[] {
       },
     }))
     .filter((exercise) => exercise.name && WORKOUT_TYPES.has(exercise.type));
+}
+
+function exercisePayload(exercises: PlanExerciseInput[]): PlanExercisePayload[] {
+  return exercises.map((exercise) => ({
+    name: exercise.name,
+    type: exercise.type,
+    variation: exercise.variation,
+    equipment: exercise.equipment,
+    required: exercise.required,
+    setCount: exercise.setCount,
+    note: exercise.note,
+    weight: exercise.set.weight,
+    reps: exercise.set.reps,
+    durationSeconds: exercise.set.durationSeconds,
+    distanceM: exercise.set.distanceM,
+    rpe: exercise.set.rpe,
+    rir: exercise.set.rir,
+    restSeconds: exercise.set.restSeconds,
+  }));
 }
 
 async function requireUser() {
@@ -276,6 +312,54 @@ export async function createWorkoutPlan(formData: FormData) {
   revalidatePath("/plans");
   revalidatePath("/today");
   redirect(`/plans?day=${scheduledDate}&saved=1`);
+}
+
+export async function updateWorkoutPlan(formData: FormData) {
+  const { supabase } = await requireUser();
+  const id = text(formData.get("id"));
+  const title = text(formData.get("title"));
+  const workoutType = String(formData.get("workout_type") ?? "");
+  const scheduledDate = text(formData.get("scheduled_date"));
+  const scheduledTime = text(formData.get("scheduled_time"));
+  const durationMinutes = integer(formData.get("target_duration_minutes"));
+  const focusText = text(formData.get("focus_text"));
+  const preparationNotes = text(formData.get("preparation_notes"));
+  const exercises = exerciseInputs(formData);
+
+  if (!id || !title || !scheduledDate || !WORKOUT_TYPES.has(workoutType) || exercises.length === 0) {
+    redirect(id ? `/plans/${id}/edit?error=invalid` : "/plans?error=invalid-update");
+  }
+
+  const source = await getPlan(supabase, id);
+  if (!source) redirect("/plans?error=plan-not-found");
+
+  const duplicateId = await findActiveDuplicatePlan(supabase, {
+    excludeId: id,
+    ownerId: source.owner_id,
+    scheduledDate,
+    scheduledTime,
+    title,
+    workoutType,
+  });
+  if (duplicateId) redirect(`/plans/${id}/edit?error=duplicate`);
+
+  const { error } = await supabase.rpc("update_workout_plan", {
+    target_plan_id: id,
+    target_title: title,
+    target_workout_type: workoutType,
+    target_scheduled_date: scheduledDate,
+    target_scheduled_time: scheduledTime,
+    target_duration_minutes: durationMinutes,
+    target_focus_text: focusText,
+    target_preparation_notes: preparationNotes,
+    target_exercises: exercisePayload(exercises),
+  });
+
+  if (error) redirect(`/plans/${id}/edit?error=${encodeURIComponent(error.message)}`);
+
+  revalidatePath("/plans");
+  revalidatePath("/today");
+  redirect(`/plans?day=${scheduledDate}&updated=1`);
 }
 
 async function getPlan(supabase: SupabaseClient, id: string): Promise<PlanWithExercises | null> {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Plus } from "lucide-react";
+import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, Clock3, Copy, Pencil, Plus } from "lucide-react";
 import {
   clonePreviousWeek,
   cloneWorkoutPlan,
@@ -276,6 +276,10 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
         <details className="mt-3 rounded-md border border-border">
           <summary className="flex min-h-11 cursor-pointer items-center px-3 text-sm font-medium text-muted-foreground">計畫操作</summary>
           <div className="space-y-3 border-t border-border p-3">
+            <Link className="flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground" href={`/plans/${plan.id}/edit`}>
+              <Pencil aria-hidden="true" className="h-4 w-4" />
+              更新計畫
+            </Link>
             <form action={rescheduleWorkoutPlan} className="flex items-end gap-2">
               <input name="id" type="hidden" value={plan.id} />
               <label className="min-w-0 flex-1 text-sm font-medium">改期
@@ -289,13 +293,6 @@ function PlanCard({ plan }: { plan: WorkoutPlan }) {
                 <input className="mt-1 min-h-11 w-full rounded-md border border-border bg-card px-2" defaultValue={addDays(plan.scheduled_date, 7)} name="target_date" required type="date" />
               </label>
               <Button type="submit" variant="secondary">複製</Button>
-            </form>
-            <form action={updateWorkoutPlanStatus} className="space-y-2">
-              <input name="id" type="hidden" value={plan.id} />
-              <input name="return_date" type="hidden" value={plan.scheduled_date} />
-              <input name="status" type="hidden" value="skipped" />
-              <input className="min-h-11 w-full rounded-md border border-border bg-card px-3" name="reason" placeholder="略過原因，可選" />
-              <Button className="w-full" type="submit" variant="secondary">今天略過</Button>
             </form>
             <form action={updateWorkoutPlanStatus}>
               <input name="id" type="hidden" value={plan.id} />
